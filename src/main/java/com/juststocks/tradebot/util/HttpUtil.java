@@ -9,8 +9,8 @@ package com.juststocks.tradebot.util;
  */
 public interface HttpUtil<T> {
 
-	T executeGetRequest(String uri);
+	T executeGet(String uri);
 	
-	T executePostRequest();
+	T executePost();
 	
 }

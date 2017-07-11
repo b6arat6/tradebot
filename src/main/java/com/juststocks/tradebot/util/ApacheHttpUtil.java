@@ -16,13 +16,15 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class ApacheHttpUtil<CloseableHttpResponse> implements HttpUtil<CloseableHttpResponse> {
 	
-	private static final CloseableHttpClient CLIENT = HttpClients.createDefault();
+	private static final CloseableHttpClient CLOSEABLE_HTTP_CLIENT = HttpClients.createDefault();
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public CloseableHttpResponse executeGetRequest(String uri) {
+	public CloseableHttpResponse executeGet(String uri) {
 		HttpGet get = new HttpGet(uri);
+		CloseableHttpResponse response = null;
 		try {
-			CloseableHttpResponse response = (CloseableHttpResponse) CLIENT.execute(get);
+			response = (CloseableHttpResponse) CLOSEABLE_HTTP_CLIENT.execute(get);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -30,11 +32,11 @@ public class ApacheHttpUtil<CloseableHttpResponse> implements HttpUtil<Closeable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return response;
 	}
 
 	@Override
-	public CloseableHttpResponse executePostRequest() {
+	public CloseableHttpResponse executePost() {
 		return null;
 	}
 
