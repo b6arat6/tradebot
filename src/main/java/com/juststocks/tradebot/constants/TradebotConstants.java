@@ -9,10 +9,10 @@ package com.juststocks.tradebot.constants;
  */
 public interface TradebotConstants {
 	
-	public static final String BEAN_TRADEBOT_PROPERTIES = "TradebotProperties";
-
-	public static final String BEAN_KC_FACADE = "KCFacade";
+	public static final String BEAN_KITE_CLIENT_FACADE = "kiteClientFacade";
 	
-	public static final String BEAN_APACHE_HTTP_UTIL = "ApacheHttpUtil";
+	public static final String BEAN_APACHE_HTTP_UTIL = "apacheHttpUtil";
+	
+	public static final String BEAN_TRADEBOT_APPLICATION = "tradebotApplication";
 	
 }

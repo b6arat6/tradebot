@@ -9,11 +9,13 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.springframework.stereotype.Component;
 
 /**
  * @author bharath_kandasamy
  *
  */
+@Component
 public class ApacheHttpUtil<CloseableHttpResponse> implements HttpUtil<CloseableHttpResponse> {
 	
 	private static final CloseableHttpClient CLOSEABLE_HTTP_CLIENT = HttpClients.createDefault();
@@ -39,5 +41,5 @@ public class ApacheHttpUtil<CloseableHttpResponse> implements HttpUtil<Closeable
 	public CloseableHttpResponse executePost() {
 		return null;
 	}
-
+	
 }
