@@ -7,34 +7,26 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.juststocks.tradebot.bean.TradebotProperties;
+import com.juststocks.tradebot.bot.KiteConnectTradebot;
 import com.juststocks.tradebot.constants.TradebotConstants;
-import com.juststocks.tradebot.facade.KiteClientFacade;
 
 @SpringBootApplication
 public class TradebotApplication implements TradebotConstants {
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger(TradebotApplication.class);
 
-	public static ConfigurableApplicationContext context;
+	private static ConfigurableApplicationContext context;
 	
-	public static TradebotApplication tradebotApplication;
-	
-	@Autowired
-	public TradebotProperties properties;
+	private static TradebotApplication tradebotApplication;
 	
 	@Autowired
-	public KiteClientFacade kiteClientFacade;
+	private KiteConnectTradebot kiteConnectTradebot;
 	
 	public static void main(String[] args) {
+		LOGGER.info(LOG_METHOD_ENTRY);
 		context = SpringApplication.run(TradebotApplication.class);
 		tradebotApplication = (TradebotApplication) context.getBean(BEAN_TRADEBOT_APPLICATION);
-		tradebotApplication.init();
-	}
-	
-	public boolean init() {
-		kiteClientFacade.login();
-		return false;
+		tradebotApplication.kiteConnectTradebot.execute(args);
+		LOGGER.info(LOG_METHOD_EXIT);
 	}
 	
 }

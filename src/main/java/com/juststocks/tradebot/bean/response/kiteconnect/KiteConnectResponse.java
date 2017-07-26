@@ -1,16 +1,16 @@
-package com.juststocks.tradebot.bean.response;
+package com.juststocks.tradebot.bean.response.kiteconnect;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class KiteClientResponse<T> {
+public class KiteConnectResponse<T> {
 
 	@SerializedName("status")
 	@Expose
 	private String status;
-	@SerializedName("kiteClientLoginData")
+	@SerializedName("data")
 	@Expose
 	private T data;
 	@SerializedName("message")

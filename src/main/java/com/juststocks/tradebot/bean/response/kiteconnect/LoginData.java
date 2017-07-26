@@ -1,8 +1,8 @@
-package com.juststocks.tradebot.bean.response;
+package com.juststocks.tradebot.bean.response.kiteconnect;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class KiteClientLoginData {
+public class LoginData {
 
 	@Override
 	public String toString() {
