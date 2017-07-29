@@ -17,4 +17,10 @@ public interface GenericClientFacade extends TradebotConstants {
 	
 	boolean loadParameters();
 	
+	boolean getInstruments();
+
+	boolean getInstruments(String exchange);
+	
+	boolean initWebSocket();
+	
 }

@@ -102,5 +102,26 @@ public class ParameterData {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+	
+	public static enum IndexEnum {
+		ORDER_VARIETY_REGULAR(0), ORDER_VARIETY_AMO(1), ORDER_VARIETY_BO(2), ORDER_VARIETY_CO(3)
+		, SEGMENT_EQUITY(0)
+		, TRANSACTION_TYPE_BUY(0), TRANSACTION_TYPE_SELL(1)
+		, ORDER_TYPE_MARKET(0), ORDER_TYPE_LIMIT(1), ORDER_TYPE_SL(2), ORDER_TYPE_SL_M(3)
+		, POSITION_TYPE_DAY(0)
+		, VALIDITY_DAY(0)
+		, PRODUCT_NRML(0), PRODUCT_CNC(1), PRODUCT_CO(2), PRODUCT_BO(3)
+		, EXCHANGE_NSE(0), EXCHANGE_BSE(1), EXCHANGE_NFO(2);
+		
+		int index;
+		
+		IndexEnum(int index) {
+			this.index = index;
+		}
+		
+		public int getIndex() {
+			return index;
+		}
+	}
 
 }

@@ -16,5 +16,5 @@ import com.juststocks.tradebot.constants.TradebotConstants;
 @SpringBootConfiguration
 @EnableConfigurationProperties(KiteConnectProperties.class)
 public class TradebotConfiguration implements TradebotConstants {
-
+	
 }

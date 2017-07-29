@@ -11,10 +11,10 @@ import com.juststocks.tradebot.constants.TradebotConstants;
  */
 public interface Tradebot extends TradebotConstants {
 	
-	boolean execute(String[] args);
+	boolean run(String[] args);
 	
 	boolean init(String[] args);
 
-	boolean process();
+	boolean service();
 	
 }

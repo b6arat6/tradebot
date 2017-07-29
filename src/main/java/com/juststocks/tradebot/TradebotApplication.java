@@ -25,7 +25,7 @@ public class TradebotApplication implements TradebotConstants {
 		LOGGER.info(LOG_METHOD_ENTRY);
 		context = SpringApplication.run(TradebotApplication.class);
 		tradebotApplication = (TradebotApplication) context.getBean(BEAN_TRADEBOT_APPLICATION);
-		tradebotApplication.kiteConnectTradebot.execute(args);
+		tradebotApplication.kiteConnectTradebot.run(args);
 		LOGGER.info(LOG_METHOD_EXIT);
 	}
 	
