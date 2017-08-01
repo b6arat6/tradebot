@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.juststocks.tradebot.bot;
+package com.juststocks.tradebot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.juststocks.tradebot.bean.KiteConnectProperties;
-import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
 import com.juststocks.tradebot.facade.KiteConnectClientFacade;
 
 /**
@@ -31,7 +30,7 @@ public class KiteConnectTradebot implements Tradebot {
 	public boolean run(String[] args) {
 		LOGGER.info(LOG_METHOD_ENTRY);
 		if (init(args)) {
-			service();
+			execute();
 		}
 		LOGGER.info(LOG_METHOD_EXIT);
 		return false;
@@ -49,7 +48,7 @@ public class KiteConnectTradebot implements Tradebot {
 	}
 
 	@Override
-	public boolean service() {
+	public boolean execute() {
 		LOGGER.info(LOG_METHOD_ENTRY);
 		if (clientFacade.login()) {
 			LOGGER.info(LOG_LOGIN_SUCCESS);
@@ -58,7 +57,7 @@ public class KiteConnectTradebot implements Tradebot {
 				if (clientFacade.loadParameters()) {
 					LOGGER.info(LOG_PARAMETER_LOAD_SUCCESS);
 					if (clientFacade.getInstruments(
-							properties.getParameterData().getExchange().get(ParameterData.IndexEnum.EXCHANGE_NFO.getIndex()))) {
+							properties.getParameterData().getExchange().get(properties.getStrategyOHLExchangeIndex()))) {
 						LOGGER.info(LOG_EXCHANGE_INSTRUMENTS_GET_SUCCESS);
 						if (clientFacade.initWebSocket()) {
 							LOGGER.info(LOG_WEB_SOCKECT_INIT_SUCCESS);

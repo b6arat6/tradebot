@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.juststocks.tradebot.bot;
+package com.juststocks.tradebot;
 
 import com.juststocks.tradebot.constants.TradebotConstants;
 
@@ -15,6 +15,6 @@ public interface Tradebot extends TradebotConstants {
 	
 	boolean init(String[] args);
 
-	boolean service();
+	boolean execute();
 	
 }

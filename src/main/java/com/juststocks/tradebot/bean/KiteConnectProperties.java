@@ -39,6 +39,12 @@ public class KiteConnectProperties implements TradebotConstants {
 	
 	private String parameterApiPath;
 	
+	private int strategyOHLExchangeIndex;
+	
+	private String strategyOHLInstrumentType;
+	
+	private String strategyOHLExpiryMonth;
+	
 	private Map<String, String> authUriMap;
 	
 	private ParameterData parameterData;
@@ -129,6 +135,30 @@ public class KiteConnectProperties implements TradebotConstants {
 		this.parameterApiPath = parameterApiPath;
 	}
 
+	public int getStrategyOHLExchangeIndex() {
+		return strategyOHLExchangeIndex;
+	}
+
+	public void setStrategyOHLExchangeIndex(int strategyOHLExchangeParamIndex) {
+		this.strategyOHLExchangeIndex = strategyOHLExchangeParamIndex;
+	}
+
+	public String getStrategyOHLInstrumentType() {
+		return strategyOHLInstrumentType;
+	}
+
+	public void setStrategyOHLInstrumentType(String strategyOHLInstrumentType) {
+		this.strategyOHLInstrumentType = strategyOHLInstrumentType;
+	}
+
+	public String getStrategyOHLExpiryMonth() {
+		return strategyOHLExpiryMonth;
+	}
+
+	public void setStrategyOHLExpiryMonth(String strategyOHLExpiryMonth) {
+		this.strategyOHLExpiryMonth = strategyOHLExpiryMonth;
+	}
+
 	public Map<String, String> getAuthUriMap() {
 		return authUriMap;
 	}
@@ -156,9 +186,9 @@ public class KiteConnectProperties implements TradebotConstants {
 		setTokenMap(instruments);
 	}
 
-	public List<Long> getTokens(String exchange, String instrumentType, String expiry) {
+	public List<Long> getTokens(String exchange, String instrumentType, String expiryMonth) {
 		for (Instrument instrument : getInstrumentMap().get(exchange)) {
-			if (instrument.getInstrument_type().equals(instrumentType) && instrument.getTradingsymbol().contains(expiry.toUpperCase())) {
+			if (instrument.getInstrument_type().equals(instrumentType) && instrument.getTradingsymbol().contains(expiryMonth.toUpperCase())) {
 				tokens.add(instrument.getInstrument_token());
 			}
 		}

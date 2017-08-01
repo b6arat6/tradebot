@@ -145,9 +145,9 @@ public class KiteConnectClientFacade implements GenericClientFacade {
 		LOGGER.info(LOG_METHOD_ENTRY);
 		this.kiteTicker = new KiteTicker(kiteConnect);
 		ArrayList<Long> tokens = (ArrayList<Long>) properties.getTokens(
-				properties.getParameterData().getExchange().get(ParameterData.IndexEnum.EXCHANGE_NFO.getIndex())
-				, KITE_CONNECT_PARAMETER_DATA_INSTRUMENT_TYPE_FUT
-				, Month.AUGUST.toString().substring(0, 3));
+				properties.getParameterData().getExchange().get(properties.getStrategyOHLExchangeIndex())
+				, properties.getStrategyOHLInstrumentType()
+				, properties.getStrategyOHLExpiryMonth());
 		kiteTicker.setOnConnectedListener(new OnConnect() {
 			@Override
 			public void onConnected() {

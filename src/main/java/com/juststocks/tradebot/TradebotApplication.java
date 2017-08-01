@@ -7,7 +7,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.juststocks.tradebot.bot.KiteConnectTradebot;
 import com.juststocks.tradebot.constants.TradebotConstants;
 
 @SpringBootApplication
