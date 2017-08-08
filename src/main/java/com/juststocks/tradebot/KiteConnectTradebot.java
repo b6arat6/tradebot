@@ -3,6 +3,8 @@
  */
 package com.juststocks.tradebot;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,9 @@ public class KiteConnectTradebot implements Tradebot {
 						LOGGER.info(LOG_EXCHANGE_INSTRUMENTS_GET_SUCCESS);
 						if (clientFacade.initWebSocket()) {
 							LOGGER.info(LOG_WEB_SOCKECT_INIT_SUCCESS);
+							if (clientFacade.subscribeInstruments((ArrayList<Long>) properties.getTokens())) {
+								LOGGER.info(LOG_INSTRUMENTS_SUBSCRIPTION_SUCCESS);
+							}
 						}
 					}
 				}
