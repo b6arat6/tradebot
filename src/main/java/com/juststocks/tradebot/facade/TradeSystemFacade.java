@@ -11,7 +11,7 @@ import com.juststocks.tradebot.constants.TradebotConstants;
  * @author bharath_kandasamy
  *
  */
-public interface GenericClientFacade extends TradebotConstants {
+public interface TradeSystemFacade extends TradebotConstants {
 
 	boolean login();
 	
@@ -25,6 +25,8 @@ public interface GenericClientFacade extends TradebotConstants {
 	
 	boolean initWebSocket();
 	
+	public void triggerOHLStrategyOrders();
+
 	boolean subscribeInstruments(ArrayList<Long> tokens);
 	
 	boolean unsubscribeInstruments(ArrayList<Long> tokens);

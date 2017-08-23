@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
 
 import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
 import com.juststocks.tradebot.constants.TradebotConstants;
 import com.rainmatter.models.Instrument;
-import com.rainmatter.models.Tick;
 
 /**
  * @author bharath_kandasamy
@@ -23,9 +24,9 @@ import com.rainmatter.models.Tick;
 @ConfigurationProperties("com.juststocks.tradebot.kiteconnect")
 public class KiteConnectProperties implements TradebotConstants {
 	
-	public static Map<Long, Tick> olTickMap = new ConcurrentSkipListMap<>();
+	public static Set<OLTick> olTickSet = new ConcurrentSkipListSet<>();
 	
-	public static Map<Long, Tick> ohTickMap = new ConcurrentSkipListMap<>();
+	public static Set<OHTick> ohTickSet = new ConcurrentSkipListSet<>();
 	
 	private String userId;
 	
@@ -194,10 +195,11 @@ public class KiteConnectProperties implements TradebotConstants {
 
 	public List<Long> getTokens() {
 		for (Instrument instrument : getInstrumentMap().get(getParameterData().getExchange().get(strategyOHLExchangeIndex))) {
-			if ((strategyOHLInstrumentType == null
+			if ((StringUtils.isEmpty(strategyOHLInstrumentType)
 					|| instrument.getInstrument_type().equals(strategyOHLInstrumentType))
-					&& (strategyOHLExpiryMonth == null 
-					|| instrument.getTradingsymbol().contains(strategyOHLExpiryMonth.toUpperCase()))) {
+					&& (org.apache.commons.lang3.StringUtils.isBlank(strategyOHLExpiryMonth) 
+					|| instrument.getTradingsymbol().contains(strategyOHLExpiryMonth.toUpperCase()))
+					&& !instrument.getTradingsymbol().contains(SYMBOL_HYPHEN)) {
 				tokens.add(instrument.getInstrument_token());
 			}
 		}

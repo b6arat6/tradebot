@@ -14,10 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.juststocks.tradebot.akka.OHLTradeStrategyActor;
+import com.juststocks.tradebot.akka.TickDispenserActor;
 import com.juststocks.tradebot.bean.KiteConnectProperties;
 import com.juststocks.tradebot.bean.response.kiteconnect.KiteConnectResponse;
 import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
@@ -42,8 +43,8 @@ import akka.actor.ActorRef;
  *
  */
 @Service
-public class KiteConnectClientFacade implements GenericClientFacade, OnConnect, OnDisconnect, OnTick {
-	private static final Logger LOGGER = LoggerFactory.getLogger(KiteConnectClientFacade.class);
+public class KiteConnectTradeSystemFacade implements TradeSystemFacade, OnConnect, OnDisconnect, OnTick {
+	private static final Logger LOGGER = LoggerFactory.getLogger(KiteConnectTradeSystemFacade.class);
 	
 	@Autowired
 	public KiteConnectProperties properties;
@@ -69,8 +70,12 @@ public class KiteConnectClientFacade implements GenericClientFacade, OnConnect, 
 	}
 
 	@Autowired
-	@Qualifier(AKKA_OHL_TRADE_STRATEGY_ACTOR)
-	private ActorRef ohlTradeStrategyActor;
+	@Qualifier(AKKA_TICK_DISPENSER_ACTOR_REF)
+	private ActorRef tickDispenserActorRef;
+	
+	@Autowired
+	@Qualifier(AKKA_ORDER_ACTOR_REF)
+	private ActorRef orderActorRef;
 	
 	@Override
 	public boolean login() {
@@ -212,25 +217,28 @@ public class KiteConnectClientFacade implements GenericClientFacade, OnConnect, 
 	
 	@Override
 	public boolean unsubscribeInstruments(ArrayList<Long> tokens) {
-		LOGGER.info(LOG_METHOD_ENTRY);
+		LOGGER.debug(LOG_METHOD_ENTRY);
 		boolean unsubscribed = false;
 		kiteTicker.unsubscribe(tokens);
 		unsubscribed = true;
-		LOGGER.debug(LOG_INSTRUMENTS_UNSUBSCRIBED, tokens.size(), tokens.toString());
-		LOGGER.info(LOG_METHOD_EXIT);
+		LOGGER.debug(LOG_METHOD_EXIT);
 		return unsubscribed;
 	}
 	
 	@Override
 	public void onTick(ArrayList<Tick> ticks) {
-		LOGGER.info(LOG_METHOD_ENTRY);
+		LOGGER.debug(LOG_METHOD_ENTRY);
 		if (ticks.size() > 0) {
-			ohlTradeStrategyActor.tell(new OHLTradeStrategyActor.MyArrayList(ticks), ActorRef.noSender());
+			tickDispenserActorRef.tell(new TickDispenserActor.MyArrayList(ticks), ActorRef.noSender());
 		}
-		LOGGER.info(OL_TICK_MAP, KiteConnectProperties.olTickMap.toString());
-		LOGGER.info(OH_TICK_MAP, KiteConnectProperties.ohTickMap.toString());
-		LOGGER.info(LOG_METHOD_EXIT);
+		LOGGER.debug(LOG_METHOD_EXIT);
 	}
+	
+	@Override
+	@Scheduled(cron=CRON_ENTRY_OHL_STRATEGY_ORDERS)
+	public void triggerOHLStrategyOrders() {
+		orderActorRef.tell(ORDER_TYPE_OHL_STRATEGY, ActorRef.noSender());
+	}	
 
 	@Override
 	public void onDisconnected() {

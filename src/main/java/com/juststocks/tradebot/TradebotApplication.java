@@ -9,6 +9,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import com.juststocks.tradebot.constants.TradebotConstants;
 
+/**
+ * @author bharath_kandasamy
+ *
+ */
 @SpringBootApplication
 public class TradebotApplication implements TradebotConstants {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TradebotApplication.class);
@@ -18,13 +22,13 @@ public class TradebotApplication implements TradebotConstants {
 	private static TradebotApplication tradebotApplication;
 	
 	@Autowired
-	private KiteConnectTradebot kiteConnectTradebot;
+	private ZerodhaTradebot zerodhaTradebot;
 	
 	public static void main(String[] args) {
 		LOGGER.info(LOG_METHOD_ENTRY);
 		context = SpringApplication.run(TradebotApplication.class);
 		tradebotApplication = (TradebotApplication) context.getBean(BEAN_TRADEBOT_APPLICATION);
-		tradebotApplication.kiteConnectTradebot.run(args);
+		tradebotApplication.zerodhaTradebot.run(args);
 		LOGGER.info(LOG_METHOD_EXIT);
 	}
 	

@@ -23,7 +23,8 @@ public interface TradebotConstants {
 	public static final String LOG_INSTRUMENTS_SUBSCRIPTION_SUCCESS = "Instruments subscription success";
 	public static final String LOG_INSTRUMENTS_SUBSCRIBED = "SubscribedInstruments, Size={}, Instruments={}";
 	public static final String LOG_INSTRUMENTS_UNSUBSCRIPTION_SUCCESS = "Instruments subscription success";
-	public static final String LOG_INSTRUMENTS_UNSUBSCRIBED = "UnsubscribedInstruments, Size={}, Instruments={}";
+	public static final String LOG_INSTRUMENT_UNSUBSCRIBING= "UnsubscribingInstrument={}";
+	public static final String LOG_ORDER_TYPE_OHL_STRATEGY_ORDERS_TRIGGERED = "OrderActor for OHLStrategy triggered";
 	
 	public static final String BEAN_KITE_CLIENT_FACADE = "kiteConnectClientFacade";
 	public static final String BEAN_APACHE_HTTP_UTIL = "apacheHttpUtil";
@@ -34,22 +35,27 @@ public interface TradebotConstants {
 	
 	public static final String SYMBOL_QUESTION = "?";
 	public static final String SYMBOL_AMPERSAND = "&";
+	public static final String SYMBOL_HYPHEN = "-";
 
 	public static final String KITE_CONNECT_QUERY_PARAM_API_KEY = "api_key=";
 	public static final String KITE_CONNECT_QUERY_PARAM_ACCESS_TOKEN = "access_token=";
 	
 	public static final String AKKA_ACTOR_SYSTEM = "TradebotAkkaActorSystem";
-	public static final String AKKA_OHL_TRADE_STRATEGY_ACTOR = "OHLTradeStrategyActor";
-	public static final String AKKA_ORDER_ACTOR = "OrderActor";
+	public static final String AKKA_OHL_STRATEGY_ACTOR_REF = "OHLStrategyActorRef";
+	public static final String AKKA_TICK_DISPENSER_ACTOR_REF = "TickDispenserActorRef";
+	public static final String AKKA_ORDER_ACTOR_REF = "OrderActorRef";
 
-	public static final String TRADE_STRATEGY_OHL_OL = "O=H, S(-), I={}, L={}, O={}, H={}, LTP={}";
-	public static final String TRADE_STRATEGY_OHL_OH = "O=L, B(+), I={}, L={}, O={}, H={}, LTP={}";
-	public static final String TRADE_STRATEGY_OHL_OL_REMOVED = "Removed from OLMap, I={}";
-	public static final String TRADE_STRATEGY_OHL_OH_REMOVED = "Removed from OHMap, I={}";
+	public static final String STRATEGY_OHL_OL = "O=L, S(+), I={}, L={}, O={}, H={}, LTP={}";
+	public static final String STRATEGY_OHL_OH = "O=H, B(-), I={}, L={}, O={}, H={}, LTP={}";
+	public static final String STRATEGY_OHL_OL_REMOVED = "Removed from OLMap, I={}";
+	public static final String STRATEGY_OHL_OH_REMOVED = "Removed from OHMap, I={}";
+	public static final String STRATEGY_OHL_OL_UPDATED = "Updated from OLMap, I={}";
+	public static final String STRATEGY_OHL_OH_UPDATED = "Updated from OHMap, I={}";
+	public static final String OL_TICK_SET_SIZE = "OLTickSet, Size={}";
+	public static final String OH_TICK_SET_SIZE = "OHTickSet, Size={}";
 	
-	public static final String OL_TICK_MAP = "olTickMap={}";
-	public static final String OH_TICK_MAP = "ohTickMap={}";
+	public static final String ORDER_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
 	
-	public static final String ORDER_TYPE_OHL_TRADE_STRATEGY = "OHLTradeStrategyOrder";
+	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "30 30 0 * * 0-6";
 	
 }

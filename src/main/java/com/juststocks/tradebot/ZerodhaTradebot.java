@@ -11,22 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.juststocks.tradebot.bean.KiteConnectProperties;
-import com.juststocks.tradebot.facade.KiteConnectClientFacade;
+import com.juststocks.tradebot.facade.KiteConnectTradeSystemFacade;
 
 /**
  * @author bharath_kandasamy
  *
  */
 @Service
-public class KiteConnectTradebot implements Tradebot {
+public class ZerodhaTradebot implements Tradebot {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(KiteConnectTradebot.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ZerodhaTradebot.class);
 	
 	@Autowired
 	public KiteConnectProperties properties;
 	
 	@Autowired
-	private KiteConnectClientFacade clientFacade;
+	private KiteConnectTradeSystemFacade tradeSystemFacade;
 	
 	@Override
 	public boolean run(String[] args) {
@@ -35,7 +35,7 @@ public class KiteConnectTradebot implements Tradebot {
 			execute();
 		}
 		LOGGER.info(LOG_METHOD_EXIT);
-		return false;
+		return true;
 	}
 
 	@Override
@@ -52,18 +52,18 @@ public class KiteConnectTradebot implements Tradebot {
 	@Override
 	public boolean execute() {
 		LOGGER.info(LOG_METHOD_ENTRY);
-		if (clientFacade.login()) {
+		if (tradeSystemFacade.login()) {
 			LOGGER.info(LOG_LOGIN_SUCCESS);
-			if (clientFacade.authenticate()) {
+			if (tradeSystemFacade.authenticate()) {
 				LOGGER.info(LOG_AUTHENTICATION_SUCCESS);
-				if (clientFacade.loadParameters()) {
+				if (tradeSystemFacade.loadParameters()) {
 					LOGGER.info(LOG_PARAMETER_LOAD_SUCCESS);
-					if (clientFacade.getInstruments(
+					if (tradeSystemFacade.getInstruments(
 							properties.getParameterData().getExchange().get(properties.getStrategyOHLExchangeIndex()))) {
 						LOGGER.info(LOG_EXCHANGE_INSTRUMENTS_GET_SUCCESS);
-						if (clientFacade.initWebSocket()) {
+						if (tradeSystemFacade.initWebSocket()) {
 							LOGGER.info(LOG_WEB_SOCKECT_INIT_SUCCESS);
-							if (clientFacade.subscribeInstruments((ArrayList<Long>) properties.getTokens())) {
+							if (tradeSystemFacade.subscribeInstruments((ArrayList<Long>) properties.getTokens())) {
 								LOGGER.info(LOG_INSTRUMENTS_SUBSCRIPTION_SUCCESS);
 							}
 						}
