@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.juststocks.tradebot.bean.KiteConnectProperties;
-import com.juststocks.tradebot.facade.KiteConnectTradeSystemFacade;
+import com.juststocks.tradebot.bean.KiteProperties;
+import com.juststocks.tradebot.facade.KiteTradeSystemFacade;
 
 /**
  * @author bharath_kandasamy
@@ -20,13 +20,13 @@ import com.juststocks.tradebot.facade.KiteConnectTradeSystemFacade;
 @Service
 public class ZerodhaTradebot implements Tradebot {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ZerodhaTradebot.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
 	
 	@Autowired
-	public KiteConnectProperties properties;
+	public KiteProperties properties;
 	
 	@Autowired
-	private KiteConnectTradeSystemFacade tradeSystemFacade;
+	private KiteTradeSystemFacade tradeSystemFacade;
 	
 	@Override
 	public boolean run(String[] args) {

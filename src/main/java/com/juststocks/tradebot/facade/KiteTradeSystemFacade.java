@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.juststocks.tradebot.akka.TickDispenserActor;
-import com.juststocks.tradebot.bean.KiteConnectProperties;
-import com.juststocks.tradebot.bean.response.kiteconnect.KiteConnectResponse;
+import com.juststocks.tradebot.bean.KiteProperties;
+import com.juststocks.tradebot.bean.response.kiteconnect.KiteResponse;
 import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
 import com.juststocks.tradebot.util.ApacheHttpUtil;
 import com.juststocks.tradebot.util.SpringRestTemplateUtil;
@@ -43,11 +43,11 @@ import akka.actor.ActorRef;
  *
  */
 @Service
-public class KiteConnectTradeSystemFacade implements TradeSystemFacade, OnConnect, OnDisconnect, OnTick {
-	private static final Logger LOGGER = LoggerFactory.getLogger(KiteConnectTradeSystemFacade.class);
+public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHook, OnConnect, OnDisconnect, OnTick {
+	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
 	
 	@Autowired
-	public KiteConnectProperties properties;
+	public KiteProperties properties;
 	
 	@Autowired
 	public ApacheHttpUtil apacheHttpUtil;
@@ -110,24 +110,26 @@ public class KiteConnectTradeSystemFacade implements TradeSystemFacade, OnConnec
 			kiteConnect.setAccessToken(properties.getAccessToken());
 			kiteConnect.setPublicToken(properties.getPublicToken());
 		}
-		kiteConnect.registerHook(new SessionExpiryHook() {
-			@Override
-			public void sessionExpired() {
-				LOGGER.error(LOG_SESSION_EXPIRED);				
-			}
-		});
+		kiteConnect.registerHook(this);
 		LOGGER.info(LOG_METHOD_EXIT);
 		return (kiteConnect.getAccessToken() != null);
+	}
+	
+	@Override
+	public void sessionExpired() {
+		LOGGER.info(LOG_METHOD_ENTRY);
+		LOGGER.error(LOG_SESSION_EXPIRED);
+		LOGGER.info(LOG_METHOD_EXIT);
 	}
 
 	@Override
 	public boolean loadParameters() {
 		LOGGER.info(LOG_METHOD_ENTRY);
-		KiteConnectResponse<ParameterData> response	= springRestTemplateUtil.exchange(
+		KiteResponse<ParameterData> response	= springRestTemplateUtil.exchange(
 				properties.getApiEndpoint(properties.getParameterApiPath())
 				, HttpMethod.GET
 				, null
-				, new ParameterizedTypeReference<KiteConnectResponse<ParameterData>>() {
+				, new ParameterizedTypeReference<KiteResponse<ParameterData>>() {
 		}).getBody();
 		properties.setParameterData(response.getData());
 		LOGGER.info(LOG_RESPONSE_PARAMETERS, response.getData().toString());
@@ -223,6 +225,7 @@ public class KiteConnectTradeSystemFacade implements TradeSystemFacade, OnConnec
 		unsubscribed = true;
 		LOGGER.debug(LOG_METHOD_EXIT);
 		return unsubscribed;
+		
 	}
 	
 	@Override
@@ -247,5 +250,4 @@ public class KiteConnectTradeSystemFacade implements TradeSystemFacade, OnConnec
 		LOGGER.error(LOG_WEB_SOCKECT_DISCONNECTION);
 		LOGGER.info(LOG_METHOD_EXIT);
 	}
-
 }

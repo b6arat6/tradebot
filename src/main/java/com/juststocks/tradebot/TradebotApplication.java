@@ -15,7 +15,7 @@ import com.juststocks.tradebot.constants.TradebotConstants;
  */
 @SpringBootApplication
 public class TradebotApplication implements TradebotConstants {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TradebotApplication.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
 
 	private static ConfigurableApplicationContext context;
 	

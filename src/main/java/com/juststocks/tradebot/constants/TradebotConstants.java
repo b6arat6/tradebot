@@ -8,6 +8,11 @@ package com.juststocks.tradebot.constants;
  *
  */
 public interface TradebotConstants {
+	
+	public static final String LOGGER_MAIN = "mainLogger";
+	public static final String LOGGER_STRATEGY = "strategyLogger";
+	public static final String LOGGER_ORDER = "orderLogger";
+	
 	public static final String LOG_METHOD_ENTRY = "Entered";
 	public static final String LOG_METHOD_EXIT = "Exited";
 	public static final String LOG_LOGIN_SUCCESS = "LoggedIn";
@@ -53,6 +58,7 @@ public interface TradebotConstants {
 	public static final String STRATEGY_OHL_OH_UPDATED = "Updated from OHMap, I={}";
 	public static final String OL_TICK_SET_SIZE = "OLTickSet, Size={}";
 	public static final String OH_TICK_SET_SIZE = "OHTickSet, Size={}";
+	public static final String NON_OHL_TICK_SET_SIZE = "NonOHLTickSet, Size={}";
 	
 	public static final String ORDER_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
 	

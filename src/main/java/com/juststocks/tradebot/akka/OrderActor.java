@@ -6,9 +6,9 @@ package com.juststocks.tradebot.akka;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.juststocks.tradebot.bean.KiteConnectProperties;
+import com.juststocks.tradebot.bean.KiteProperties;
 import com.juststocks.tradebot.constants.TradebotConstants;
-import com.juststocks.tradebot.facade.KiteConnectTradeSystemFacade;
+import com.juststocks.tradebot.facade.KiteTradeSystemFacade;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
@@ -19,19 +19,19 @@ import akka.actor.Props;
  */
 public class OrderActor extends AbstractActor implements TradebotConstants {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(OrderActor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_ORDER);
 	
-	public static Props props(KiteConnectProperties kiteConnectProperties, KiteConnectTradeSystemFacade kiteConnectTradeSystemFacade) {
-		return Props.create(OrderActor.class, () -> new OrderActor(kiteConnectProperties, kiteConnectTradeSystemFacade));
+	public static Props props(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
+		return Props.create(OrderActor.class, () -> new OrderActor(kiteProperties, kiteTradeSystemFacade));
 	}
 	
-	private KiteConnectProperties kiteConnectProperties;
+	private KiteProperties kiteProperties;
 	
-	private KiteConnectTradeSystemFacade kiteConnectTradeSystemFacade;	
+	private KiteTradeSystemFacade kiteTradeSystemFacade;	
 	
-	public OrderActor(KiteConnectProperties kiteConnectProperties, KiteConnectTradeSystemFacade kiteConnectTradeSystemFacade) {
-		this.kiteConnectProperties = kiteConnectProperties;
-		this.kiteConnectTradeSystemFacade = kiteConnectTradeSystemFacade;
+	public OrderActor(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
+		this.kiteProperties = kiteProperties;
+		this.kiteTradeSystemFacade = kiteTradeSystemFacade;
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class OrderActor extends AbstractActor implements TradebotConstants {
 		return receiveBuilder().match(String.class, orderType -> {
 			if (orderType.equals(ORDER_TYPE_OHL_STRATEGY)) {
 				LOGGER.info(LOG_ORDER_TYPE_OHL_STRATEGY_ORDERS_TRIGGERED);
-//				kiteConnectTradeSystemFacade.getKiteConnect().placeOrder(params, variety);
+//				kiteTradeSystemFacade.getKiteConnect().placeOrder(params, variety);
 			}
 		}).build();
 	}

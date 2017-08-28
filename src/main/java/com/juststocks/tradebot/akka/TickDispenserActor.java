@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.juststocks.tradebot.bean.KiteConnectProperties;
+import com.juststocks.tradebot.bean.KiteProperties;
+import com.juststocks.tradebot.constants.TradebotConstants;
 import com.rainmatter.models.Tick;
 
 import akka.actor.AbstractActor;
@@ -19,20 +20,20 @@ import akka.actor.Props;
  * @author bharath_kandasamy
  *
  */
-public class TickDispenserActor extends AbstractActor {
+public class TickDispenserActor extends AbstractActor implements TradebotConstants {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(TickDispenserActor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
 	
-	public static Props props(KiteConnectProperties kiteConnectProperties, ActorRef ohlTradeStrategyActorRef) {
-		return Props.create(TickDispenserActor.class, () -> new TickDispenserActor(kiteConnectProperties, ohlTradeStrategyActorRef));
+	public static Props props(KiteProperties kiteProperties, ActorRef ohlTradeStrategyActorRef) {
+		return Props.create(TickDispenserActor.class, () -> new TickDispenserActor(kiteProperties, ohlTradeStrategyActorRef));
 	}
 
-	private KiteConnectProperties kiteConnectProperties;
+	private KiteProperties kiteProperties;
 	
 	private ActorRef ohlTradeStrategyActorRef;
 	
-	public TickDispenserActor(KiteConnectProperties kiteConnectProperties, ActorRef ohlTradeStrategyActorRef) {
-		this.kiteConnectProperties = kiteConnectProperties;
+	public TickDispenserActor(KiteProperties kiteProperties, ActorRef ohlTradeStrategyActorRef) {
+		this.kiteProperties = kiteProperties;
 		this.ohlTradeStrategyActorRef = ohlTradeStrategyActorRef;
 	}
 

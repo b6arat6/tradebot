@@ -21,12 +21,12 @@ import com.rainmatter.models.Instrument;
  * @author bharath_kandasamy
  *
  */
-@ConfigurationProperties("com.juststocks.tradebot.kiteconnect")
-public class KiteConnectProperties implements TradebotConstants {
+@ConfigurationProperties("com.juststocks.tradebot.kite")
+public class KiteProperties implements TradebotConstants {
 	
 	public static Set<OLTick> olTickSet = new ConcurrentSkipListSet<>();
-	
 	public static Set<OHTick> ohTickSet = new ConcurrentSkipListSet<>();
+	public static Set<OHLTick> nonOHLTickReSet = new ConcurrentSkipListSet<>();
 	
 	private String userId;
 	
@@ -61,6 +61,12 @@ public class KiteConnectProperties implements TradebotConstants {
 	private List<Long> tokens = new ArrayList<>();
 	
 	private Map<Long, String> tokenMap = new HashMap<>();
+	
+	private int tickDisperserActorRoutees;
+	
+	private int ohlStrategyActorRoutees;
+	
+	private int orderActorRoutees;
 	
 	public String getUserId() {
 		return userId;
@@ -218,6 +224,30 @@ public class KiteConnectProperties implements TradebotConstants {
 		for (Instrument instrument : instruments) {
 			tokenMap.put(instrument.getInstrument_token(), instrument.getTradingsymbol());
 		}
+	}
+
+	public int getTickDisperserActorRoutees() {
+		return tickDisperserActorRoutees;
+	}
+
+	public void setTickDisperserActorRoutees(int tickDisperserActorRoutees) {
+		this.tickDisperserActorRoutees = tickDisperserActorRoutees;
+	}
+
+	public int getOhlStrategyActorRoutees() {
+		return ohlStrategyActorRoutees;
+	}
+
+	public void setOhlStrategyActorRoutees(int ohlStrategyActorRoutees) {
+		this.ohlStrategyActorRoutees = ohlStrategyActorRoutees;
+	}
+
+	public int getOrderActorRoutees() {
+		return orderActorRoutees;
+	}
+
+	public void setOrderActorRoutees(int orderActorRoutees) {
+		this.orderActorRoutees = orderActorRoutees;
 	}
 
 }

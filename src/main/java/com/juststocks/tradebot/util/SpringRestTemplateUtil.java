@@ -5,14 +5,14 @@ package com.juststocks.tradebot.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 /**
  * @author bharath_kandasamy
  *
  */
-@Component
+@Service
 public class SpringRestTemplateUtil extends RestTemplate {
 	
 	public RestTemplate restTemplate;
