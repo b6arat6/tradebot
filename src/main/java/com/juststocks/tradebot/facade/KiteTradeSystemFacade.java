@@ -139,6 +139,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	
 	@Override
 	public boolean getInstruments() {
+		// TODO
 		return false;
 	}
 

@@ -47,23 +47,20 @@ public class TradebotConfiguration implements TradebotConstants {
 	
 	@Bean(name=AKKA_OHL_STRATEGY_ACTOR_REF)
 	public ActorRef ohlStrategyActor() {
-		return actorSystem()
-				.actorOf(OHLStrategyActor.props(kiteProperties, kiteTradeSystemFacade)
-						.withRouter(new SmallestMailboxPool(kiteProperties.getOhlStrategyActorRoutees())));
+		return actorSystem().actorOf(OHLStrategyActor.props(kiteProperties, kiteTradeSystemFacade)
+				.withRouter(new SmallestMailboxPool(kiteProperties.getOhlStrategyActorRoutees())));
 	}
 	
 	@Bean(name=AKKA_TICK_DISPENSER_ACTOR_REF)
 	public ActorRef tickDispenserActor() {
-		return actorSystem()
-				.actorOf(TickDispenserActor.props(kiteProperties, ohlTradeStrategyActorRef)
-						.withRouter(new SmallestMailboxPool(kiteProperties.getTickDisperserActorRoutees())));
+		return actorSystem().actorOf(TickDispenserActor.props(kiteProperties, ohlTradeStrategyActorRef)
+				.withRouter(new SmallestMailboxPool(kiteProperties.getTickDisperserActorRoutees())));
 	}
 	
 	@Bean(name=AKKA_ORDER_ACTOR_REF)
 	public ActorRef orderActor() {
-		return actorSystem()
-				.actorOf(OrderActor.props(kiteProperties, kiteTradeSystemFacade)
-						.withRouter(new SmallestMailboxPool(kiteProperties.getOrderActorRoutees())));
+		return actorSystem().actorOf(OrderActor.props(kiteProperties, kiteTradeSystemFacade)
+				.withRouter(new SmallestMailboxPool(kiteProperties.getOrderActorRoutees())));
 	}
 	
 }

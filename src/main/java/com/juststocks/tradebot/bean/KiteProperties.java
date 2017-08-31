@@ -26,7 +26,7 @@ public class KiteProperties implements TradebotConstants {
 	
 	public static Set<OLTick> olTickSet = new ConcurrentSkipListSet<>();
 	public static Set<OHTick> ohTickSet = new ConcurrentSkipListSet<>();
-	public static Set<OHLTick> nonOHLTickReSet = new ConcurrentSkipListSet<>();
+	public static Set<OHLTick> nonOHLTickSet = new ConcurrentSkipListSet<>();
 	
 	private String userId;
 	

@@ -50,45 +50,39 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 			OLTick olTick = new OLTick(tick);
 			OHTick ohTick = new OHTick(tick);
 			OHLTick ohlTick = new OHLTick(tick);
-			if (!nonOHLTickReSet.contains(ohlTick)) {
+			if (!nonOHLTickSet.contains(ohlTick)) {
 				if (tick.getOpenPrice() == tick.getLowPrice()) {
-					if (olTickSet.contains(olTick)) {
-						olTickSet.remove(olTick);
+					if (olTickSet.contains(olTick) && olTickSet.remove(olTick)) {
 						LOGGER.info(STRATEGY_OHL_OL_UPDATED, kiteProperties.getTokenMap().get(tick.getToken()),
-								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), tick.getLastTradedPrice());
+								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
+								tick.getLastTradedPrice());
+						olTickSet.add(olTick);
 					} else {
-						LOGGER.info(STRATEGY_OHL_OL, kiteProperties.getTokenMap().get(tick.getToken()), tick.getLowPrice(),
-								tick.getOpenPrice(), tick.getHighPrice(), tick.getLastTradedPrice());
+						LOGGER.info(STRATEGY_OHL_OL, kiteProperties.getTokenMap().get(tick.getToken()),
+								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
+								tick.getLastTradedPrice());
+						olTickSet.add(olTick);
 					}
-					olTickSet.add(olTick);
 				} else if (tick.getOpenPrice() == tick.getHighPrice()) {
-					if (ohTickSet.contains(ohTick)) {
-						ohTickSet.remove(ohTick);
+					if (ohTickSet.contains(ohTick) && ohTickSet.remove(ohTick)) {
 						LOGGER.info(STRATEGY_OHL_OH_UPDATED, kiteProperties.getTokenMap().get(tick.getToken()),
-								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), tick.getLastTradedPrice());
+								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
+								tick.getLastTradedPrice());
+						ohTickSet.add(ohTick);
 					} else {
-						LOGGER.info(STRATEGY_OHL_OH, kiteProperties.getTokenMap().get(tick.getToken()), tick.getLowPrice(),
-								tick.getOpenPrice(), tick.getHighPrice(), tick.getLastTradedPrice());
+						LOGGER.info(STRATEGY_OHL_OH, kiteProperties.getTokenMap().get(tick.getToken()),
+								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
+								tick.getLastTradedPrice());
+						ohTickSet.add(ohTick);
 					}
-					ohTickSet.add(ohTick);
 				} else {
-					if (olTickSet.contains(olTick)) {
-						if (olTickSet.remove(olTick)) {
-							LOGGER.info(STRATEGY_OHL_OL_REMOVED, kiteProperties.getTokenMap().get(tick.getToken()));
-							LOGGER.info(STRATEGY_OHL_OL, kiteProperties.getTokenMap().get(tick.getToken()),
-									tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
-									tick.getLastTradedPrice());
-						}
-					} else if (ohTickSet.contains(ohTick)) {
-						if (ohTickSet.remove(ohTick)) {
-							LOGGER.info(STRATEGY_OHL_OH_REMOVED, kiteProperties.getTokenMap().get(tick.getToken()));
-							LOGGER.info(STRATEGY_OHL_OH, kiteProperties.getTokenMap().get(tick.getToken()),
-									tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
-									tick.getLastTradedPrice());
-						}
+					if (olTickSet.contains(olTick) && olTickSet.remove(olTick)) {
+						LOGGER.warn(STRATEGY_OHL_OL_REMOVED, kiteProperties.getTokenMap().get(tick.getToken()));
+					} else if (ohTickSet.contains(ohTick) && ohTickSet.remove(ohTick)) {
+						LOGGER.warn(STRATEGY_OHL_OH_REMOVED, kiteProperties.getTokenMap().get(tick.getToken()));
 					}
 					LOGGER.info(LOG_INSTRUMENT_UNSUBSCRIBING, kiteProperties.getTokenMap().get(tick.getToken()));
-					nonOHLTickReSet.add(ohlTick);
+					nonOHLTickSet.add(ohlTick);
 					unsubscribeTicks.add(tick.getToken());
 				}
 				if (unsubscribeTicks.size() > 0) {
@@ -96,7 +90,7 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 				}
 				LOGGER.info(OL_TICK_SET_SIZE, KiteProperties.olTickSet.size());
 				LOGGER.info(OH_TICK_SET_SIZE, KiteProperties.ohTickSet.size());
-				LOGGER.info(NON_OHL_TICK_SET_SIZE, KiteProperties.nonOHLTickReSet.size());
+				LOGGER.info(NON_OHL_TICK_SET_SIZE, KiteProperties.nonOHLTickSet.size());
 			}
 		}).build();
 	}
