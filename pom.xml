@@ -44,16 +44,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/log4j/log4j -->
-		<!-- <dependency> -->
-		<!-- <groupId>log4j</groupId> -->
-		<!-- <artifactId>log4j</artifactId> -->
-		<!-- <version>1.2.17</version> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.8.0-alpha2</version><!--$NO-MVN-MAN-VER$-->
+			<version>1.8.0-alpha2</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
 		<dependency>
 			<groupId>com.rainmatter.kiteconnect</groupId>
@@ -91,6 +85,12 @@
 			<groupId>com.typesafe.akka</groupId>
 			<artifactId>akka-testkit_2.12</artifactId>
 			<version>2.5.3</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.codehaus.jsr166-mirror/jsr166 -->
+		<dependency>
+			<groupId>org.codehaus.jsr166-mirror</groupId>
+			<artifactId>jsr166</artifactId>
+			<version>1.7.0</version>
 		</dependency>
 	</dependencies>
 

@@ -4,11 +4,12 @@
 package com.juststocks.tradebot.bean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
@@ -24,9 +25,13 @@ import com.rainmatter.models.Instrument;
 @ConfigurationProperties("com.juststocks.tradebot.kite")
 public class KiteProperties implements TradebotConstants {
 	
-	public static Set<OLTick> olTickSet = new ConcurrentSkipListSet<>();
-	public static Set<OHTick> ohTickSet = new ConcurrentSkipListSet<>();
-	public static Set<OHLTick> nonOHLTickSet = new ConcurrentSkipListSet<>();
+	public static SortedSet<OLTick> olTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
+	public static SortedSet<OHTick> ohTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
+	public static SortedSet<OHLTick> nonOHLTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
+	
+//	public static SortedSet<OLTick> olTickSet = new ConcurrentSkipListSet<>();
+//	public static SortedSet<OHTick> ohTickSet = new ConcurrentSkipListSet<>();
+//	public static SortedSet<OHLTick> nonOHLTickSet = new ConcurrentSkipListSet<>();
 	
 	private String userId;
 	

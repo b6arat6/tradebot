@@ -28,7 +28,7 @@ public interface TradebotConstants {
 	public static final String LOG_INSTRUMENTS_SUBSCRIPTION_SUCCESS = "Instruments subscription success";
 	public static final String LOG_INSTRUMENTS_SUBSCRIBED = "SubscribedInstruments, Size={}, Instruments={}";
 	public static final String LOG_INSTRUMENTS_UNSUBSCRIPTION_SUCCESS = "Instruments subscription success";
-	public static final String LOG_INSTRUMENT_UNSUBSCRIBING= "UnsubscribingInstrument={}";
+	public static final String LOG_INSTRUMENT_UNSUBSCRIBING= "UnsubscribingInstrument={}, T={}";
 	public static final String LOG_ORDER_TYPE_OHL_STRATEGY_ORDERS_TRIGGERED = "OrderActor for OHLStrategy triggered";
 	
 	public static final String BEAN_KITE_CLIENT_FACADE = "kiteConnectClientFacade";
@@ -50,12 +50,12 @@ public interface TradebotConstants {
 	public static final String AKKA_TICK_DISPENSER_ACTOR_REF = "TickDispenserActorRef";
 	public static final String AKKA_ORDER_ACTOR_REF = "OrderActorRef";
 
-	public static final String STRATEGY_OHL_OL = "O=L, S(+), I={}, L={}, O={}, H={}, LTP={}";
-	public static final String STRATEGY_OHL_OH = "O=H, B(-), I={}, L={}, O={}, H={}, LTP={}";
-	public static final String STRATEGY_OHL_OL_REMOVED = "Removed from OLMap, I={}";
-	public static final String STRATEGY_OHL_OH_REMOVED = "Removed from OHMap, I={}";
-	public static final String STRATEGY_OHL_OL_UPDATED = "Updated from OLMap, I={}";
-	public static final String STRATEGY_OHL_OH_UPDATED = "Updated from OHMap, I={}";
+	public static final String STRATEGY_OHL_OL = "O=L, S(+), I={}, L={}, O={}, H={}, LTP={}, T={}";
+	public static final String STRATEGY_OHL_OH = "O=H, B(-), I={}, L={}, O={}, H={}, LTP={}, T={}";
+	public static final String STRATEGY_OHL_OL_REMOVED = "Removed from OLMap, I={}, L={}, O={}, H={}, LTP={}, T={}";
+	public static final String STRATEGY_OHL_OH_REMOVED = "Removed from OHMap, I={}, L={}, O={}, H={}, LTP={}, T={}";
+	public static final String STRATEGY_OHL_OL_UPDATED = "Updated from OLMap, I={}, L={}, O={}, H={}, LTP={}, T={}";
+	public static final String STRATEGY_OHL_OH_UPDATED = "Updated from OHMap, I={}, L={}, O={}, H={}, LTP={}, T={}";
 	public static final String OL_TICK_SET_SIZE = "OLTickSet, Size={}";
 	public static final String OH_TICK_SET_SIZE = "OHTickSet, Size={}";
 	public static final String NON_OHL_TICK_SET_SIZE = "NonOHLTickSet, Size={}";

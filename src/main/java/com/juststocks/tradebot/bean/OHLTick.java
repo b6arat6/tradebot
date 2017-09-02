@@ -7,7 +7,7 @@ import com.rainmatter.models.Tick;
  *
  */
 public class OHLTick extends Tick implements Comparable<OHLTick> {
-	Tick tick;
+	final Tick tick;
 
 	public OHLTick(Tick tick) {
 		this.tick = tick;
