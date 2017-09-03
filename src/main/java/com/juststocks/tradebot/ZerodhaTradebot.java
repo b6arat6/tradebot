@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.juststocks.tradebot.bean.KiteProperties;
 import com.juststocks.tradebot.facade.KiteTradeSystemFacade;
+
+import akka.actor.Cancellable;
 
 /**
  * @author bharath_kandasamy
@@ -27,6 +30,10 @@ public class ZerodhaTradebot implements Tradebot {
 	
 	@Autowired
 	private KiteTradeSystemFacade tradeSystemFacade;
+	
+	@Autowired
+	@Qualifier(AKKA_TRADEABLE_TICK_DATA_LOGGING_ACTOR_CANCELLABLE)
+	Cancellable tradeableTickDataLoggingActorCancellable;
 	
 	@Override
 	public boolean run(String[] args) {
@@ -72,6 +79,12 @@ public class ZerodhaTradebot implements Tradebot {
 			}
 		}
 		LOGGER.info(LOG_METHOD_EXIT);
+		return true;
+	}
+
+	@Override
+	public boolean stop() {
+		tradeableTickDataLoggingActorCancellable.cancel();
 		return true;
 	}
 

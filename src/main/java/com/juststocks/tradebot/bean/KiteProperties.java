@@ -6,8 +6,10 @@ package com.juststocks.tradebot.bean;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -27,7 +29,7 @@ public class KiteProperties implements TradebotConstants {
 	
 	public static SortedSet<OLTick> olTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
 	public static SortedSet<OHTick> ohTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
-	public static SortedSet<OHLTick> nonOHLTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
+	public static Set<OHLTick> nonOHLTickSet = Collections.synchronizedSet(new HashSet<>());
 	
 //	public static SortedSet<OLTick> olTickSet = new ConcurrentSkipListSet<>();
 //	public static SortedSet<OHTick> ohTickSet = new ConcurrentSkipListSet<>();
@@ -72,6 +74,8 @@ public class KiteProperties implements TradebotConstants {
 	private int ohlStrategyActorRoutees;
 	
 	private int orderActorRoutees;
+	
+	private int tradeableTickDataLoggingInterval;
 	
 	public String getUserId() {
 		return userId;
@@ -253,6 +257,14 @@ public class KiteProperties implements TradebotConstants {
 
 	public void setOrderActorRoutees(int orderActorRoutees) {
 		this.orderActorRoutees = orderActorRoutees;
+	}
+
+	public int getTradeableTickDataLoggingInterval() {
+		return tradeableTickDataLoggingInterval;
+	}
+
+	public void setTradeableTickDataLoggingInterval(int tradeableTickDataLoggingInterval) {
+		this.tradeableTickDataLoggingInterval = tradeableTickDataLoggingInterval;
 	}
 
 }

@@ -27,24 +27,7 @@ public class OHLTick extends Tick implements Comparable<OHLTick> {
 	
 	@Override
 	public int compareTo(OHLTick ohlTick) {
-		if (tick.getToken() == ohlTick.tick.getToken()) {
-			return 0;
-		} else {
-			if (getNetLowChange() < ohlTick.getNetLowChange()
-					&& getNetHighChange() < ohlTick.getNetHighChange()) {
-				return -1;
-			} else if (getNetLowChange() > ohlTick.getNetLowChange()
-					&& getNetHighChange() > ohlTick.getNetHighChange()) {
-				return 1;
-			} else if (getNetLowChange() < ohlTick.getNetLowChange()
-					|| getNetHighChange() < ohlTick.getNetHighChange()) {
-				return -1;
-			} else if (getNetLowChange() > ohlTick.getNetLowChange()
-					|| getNetHighChange() > ohlTick.getNetHighChange()) {
-				return 1;
-			}
-			return 0;
-		}
+		return (int) (tick.getToken() - ohlTick.tick.getToken());
 	}
 	
 }

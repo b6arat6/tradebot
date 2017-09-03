@@ -37,7 +37,7 @@ public class OrderActor extends AbstractActor implements TradebotConstants {
 	@Override
 	public Receive createReceive() {
 		return receiveBuilder().match(String.class, orderType -> {
-			if (orderType.equals(ORDER_TYPE_OHL_STRATEGY)) {
+			if (orderType.equals(ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY)) {
 				LOGGER.info(LOG_ORDER_TYPE_OHL_STRATEGY_ORDERS_TRIGGERED);
 //				kiteTradeSystemFacade.getKiteConnect().placeOrder(params, variety);
 			}

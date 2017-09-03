@@ -17,4 +17,6 @@ public interface Tradebot extends TradebotConstants {
 
 	boolean execute();
 	
+	boolean stop();
+	
 }

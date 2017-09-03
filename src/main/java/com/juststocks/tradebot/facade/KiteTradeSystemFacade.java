@@ -37,6 +37,7 @@ import com.rainmatter.ticker.OnDisconnect;
 import com.rainmatter.ticker.OnTick;
 
 import akka.actor.ActorRef;
+import akka.actor.Cancellable;
 
 /**
  * @author bharath_kandasamy
@@ -61,14 +62,6 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	
 	public boolean webSocketConnected;
 	
-	public KiteConnect getKiteConnect() {
-		return kiteConnect;
-	}
-
-	public void setKiteConnect(KiteConnect kiteConnect) {
-		this.kiteConnect = kiteConnect;
-	}
-
 	@Autowired
 	@Qualifier(AKKA_TICK_DISPENSER_ACTOR_REF)
 	private ActorRef tickDispenserActorRef;
@@ -76,6 +69,14 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	@Autowired
 	@Qualifier(AKKA_ORDER_ACTOR_REF)
 	private ActorRef orderActorRef;
+	
+	public KiteConnect getKiteConnect() {
+		return kiteConnect;
+	}
+
+	public void setKiteConnect(KiteConnect kiteConnect) {
+		this.kiteConnect = kiteConnect;
+	}
 	
 	@Override
 	public boolean login() {
@@ -241,7 +242,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	@Override
 	@Scheduled(cron=CRON_ENTRY_OHL_STRATEGY_ORDERS)
 	public void triggerOHLStrategyOrders() {
-		orderActorRef.tell(ORDER_TYPE_OHL_STRATEGY, ActorRef.noSender());
+		orderActorRef.tell(ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY, ActorRef.noSender());
 	}	
 
 	@Override
@@ -251,4 +252,5 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		LOGGER.error(LOG_WEB_SOCKECT_DISCONNECTION);
 		LOGGER.info(LOG_METHOD_EXIT);
 	}
+	
 }

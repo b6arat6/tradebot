@@ -12,6 +12,7 @@ public interface TradebotConstants {
 	public static final String LOGGER_MAIN = "mainLogger";
 	public static final String LOGGER_STRATEGY = "strategyLogger";
 	public static final String LOGGER_ORDER = "orderLogger";
+	public static final String LOGGER_TRADEABLE_TICK = "tradeableTickLogger";
 	
 	public static final String LOG_METHOD_ENTRY = "Entered";
 	public static final String LOG_METHOD_EXIT = "Exited";
@@ -49,9 +50,10 @@ public interface TradebotConstants {
 	public static final String AKKA_OHL_STRATEGY_ACTOR_REF = "OHLStrategyActorRef";
 	public static final String AKKA_TICK_DISPENSER_ACTOR_REF = "TickDispenserActorRef";
 	public static final String AKKA_ORDER_ACTOR_REF = "OrderActorRef";
+	public static final String AKKA_TRADEABLE_TICK_DATA_LOGGING_ACTOR_CANCELLABLE = "TradeableTickDataLoggingActorCancellable";
 
-	public static final String STRATEGY_OHL_OL = "O=L, S(+), I={}, L={}, O={}, H={}, LTP={}, T={}";
-	public static final String STRATEGY_OHL_OH = "O=H, B(-), I={}, L={}, O={}, H={}, LTP={}, T={}";
+	public static final String STRATEGY_OHL_OL = "O=L, B(+), I={}, L={}, O={}, H={}, LTP={}, T={}";
+	public static final String STRATEGY_OHL_OH = "O=H, S(-), I={}, L={}, O={}, H={}, LTP={}, T={}";
 	public static final String STRATEGY_OHL_OL_REMOVED = "Removed from OLMap, I={}, L={}, O={}, H={}, LTP={}, T={}";
 	public static final String STRATEGY_OHL_OH_REMOVED = "Removed from OHMap, I={}, L={}, O={}, H={}, LTP={}, T={}";
 	public static final String STRATEGY_OHL_OL_UPDATED = "Updated from OLMap, I={}, L={}, O={}, H={}, LTP={}, T={}";
@@ -60,7 +62,11 @@ public interface TradebotConstants {
 	public static final String OH_TICK_SET_SIZE = "OHTickSet, Size={}";
 	public static final String NON_OHL_TICK_SET_SIZE = "NonOHLTickSet, Size={}";
 	
-	public static final String ORDER_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
+	public static final String OHL_OL_TICK = "O=L, I={}, L={}, O={}, H={}, LTP={}, NLC={}, NHC={}, TbTs={}, T={}";
+	public static final String OHL_OH_TICK = "O=H, I={}, L={}, O={}, H={}, LTP={}, NLC={}, NHC={}, TbTs={}, T={}";
+	
+	public static final String ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
+	public static final String ACTOR_TRADEABLE_TICK_DATA_LOGGING_ACTOR_MSG = "LogTickData";
 	
 	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "30 30 0 * * 0-6";
 	
