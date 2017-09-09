@@ -49,10 +49,11 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.8.0-alpha2</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.rainmatter.kiteconnect/kiteconnect -->
 		<dependency>
 			<groupId>com.rainmatter.kiteconnect</groupId>
 			<artifactId>kiteconnect</artifactId>
-			<version>1.1</version>
+			<version>1.4.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -91,6 +92,12 @@
 			<groupId>org.codehaus.jsr166-mirror</groupId>
 			<artifactId>jsr166</artifactId>
 			<version>1.7.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.2</version>
 		</dependency>
 	</dependencies>
 

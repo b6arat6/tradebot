@@ -74,11 +74,11 @@ public class TradebotConfiguration implements TradebotConstants {
 	@Bean(name=AKKA_TRADEABLE_TICK_DATA_LOGGING_ACTOR_CANCELLABLE)
 	public Cancellable tradeableTickDataLoggingActorCancellable() {
 		return actorSystem.scheduler()
-				.schedule(Duration.Zero()
+				.schedule(Duration.create(kiteProperties.getTradeableTickDataLoggingInitDelay(), TimeUnit.MILLISECONDS)
 						, Duration.create(kiteProperties.getTradeableTickDataLoggingInterval(), TimeUnit.MILLISECONDS)
 						, actorSystem.actorOf(TradeableTickDataLoggingActor.props(kiteProperties))
-						, ACTOR_TRADEABLE_TICK_DATA_LOGGING_ACTOR_MSG
-						, null
+						, ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING
+						, actorSystem.dispatcher()
 						, ActorRef.noSender());
 	}
 	

@@ -11,30 +11,7 @@ public class OLTick extends OHLTick {
 		super(tick);
 	}
 	
-	@Override
-	public int compareTo(OHLTick ohlTick) {
-		if (super.compareTo(ohlTick) == 0) {
-			return 0;
-		} else {
-			if (getNetLowChange() < ohlTick.getNetLowChange()
-//					&& isTbGreaterThanTs()
-					&& getNetHighChange() < ohlTick.getNetHighChange()) {
-				return -1;
-			} else if (getNetLowChange() > ohlTick.getNetLowChange()
-//					&& isTbGreaterThanTs()
-					&& getNetHighChange() > ohlTick.getNetHighChange()) {
-				return 1;
-			} else if (getNetLowChange() > ohlTick.getNetLowChange()
-//					|| isTbGreaterThanTs()
-					|| getNetHighChange() > ohlTick.getNetHighChange()) {
-				return 1;
-			} else if (getNetLowChange() > ohlTick.getNetLowChange()
-//					|| isTbGreaterThanTs()
-					|| getNetHighChange() > ohlTick.getNetHighChange()) {
-				return 1;
-			}
-			return 0;
-		}
+	public boolean isOL() {
+		return tick.getOpenPrice() == tick.getLowPrice();
 	}
-	
 }

@@ -4,14 +4,12 @@
 package com.juststocks.tradebot.bean;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
@@ -27,13 +25,9 @@ import com.rainmatter.models.Instrument;
 @ConfigurationProperties("com.juststocks.tradebot.kite")
 public class KiteProperties implements TradebotConstants {
 	
-	public static SortedSet<OLTick> olTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
-	public static SortedSet<OHTick> ohTickSet = Collections.synchronizedSortedSet(new TreeSet<>());
-	public static Set<OHLTick> nonOHLTickSet = Collections.synchronizedSet(new HashSet<>());
-	
-//	public static SortedSet<OLTick> olTickSet = new ConcurrentSkipListSet<>();
-//	public static SortedSet<OHTick> ohTickSet = new ConcurrentSkipListSet<>();
-//	public static SortedSet<OHLTick> nonOHLTickSet = new ConcurrentSkipListSet<>();
+	public static Map<Long, OLTick> olTickMap = new ConcurrentHashMap<>();
+	public static Map<Long, OHTick> ohTickMap = new ConcurrentHashMap<>();
+	public static Set<Long> nonOHLTickSet = new ConcurrentSkipListSet<>();
 	
 	private String userId;
 	
@@ -53,11 +47,11 @@ public class KiteProperties implements TradebotConstants {
 	
 	private String parameterApiPath;
 	
-	private int strategyOHLExchangeIndex;
+	private int ohlStrategyExchangeIndex;
 	
-	private String strategyOHLInstrumentType;
+	private String ohlStrategyInstrumentType;
 	
-	private String strategyOHLExpiryMonth;
+	private String ohlStrategyExpiryMonth;
 	
 	private Map<String, String> authUriMap;
 	
@@ -67,7 +61,7 @@ public class KiteProperties implements TradebotConstants {
 	
 	private List<Long> tokens = new ArrayList<>();
 	
-	private Map<Long, String> tokenMap = new HashMap<>();
+	private Map<Long, String> tradingSymbolMap = new HashMap<>();
 	
 	private int tickDisperserActorRoutees;
 	
@@ -75,7 +69,25 @@ public class KiteProperties implements TradebotConstants {
 	
 	private int orderActorRoutees;
 	
+	private int tradeableTickDataLoggingInitDelay;
+	
 	private int tradeableTickDataLoggingInterval;
+	
+	private double ohlTradeableNLC;
+	
+	private double ohlTradeableNHC;
+	
+	private boolean enableOHLTsTbConstraint;
+	
+	private int ohlTradeCount;
+	
+	private int ohlTradeTypePerInstrument;
+	
+	private int ohlTradeQtyPerInstrument;
+	
+	private int ohlTradeTxnPerInstrument;
+	
+	private int ohlTradeTotalTxn; 
 	
 	public String getUserId() {
 		return userId;
@@ -157,28 +169,28 @@ public class KiteProperties implements TradebotConstants {
 		this.parameterApiPath = parameterApiPath;
 	}
 
-	public int getStrategyOHLExchangeIndex() {
-		return strategyOHLExchangeIndex;
+	public int getOhlStrategyExchangeIndex() {
+		return ohlStrategyExchangeIndex;
 	}
 
-	public void setStrategyOHLExchangeIndex(int strategyOHLExchangeParamIndex) {
-		this.strategyOHLExchangeIndex = strategyOHLExchangeParamIndex;
+	public void setOhlStrategyExchangeIndex(int ohlStrategyExchangeIndex) {
+		this.ohlStrategyExchangeIndex = ohlStrategyExchangeIndex;
 	}
 
-	public String getStrategyOHLInstrumentType() {
-		return strategyOHLInstrumentType;
+	public String getOhlStrategyInstrumentType() {
+		return ohlStrategyInstrumentType;
 	}
 
-	public void setStrategyOHLInstrumentType(String strategyOHLInstrumentType) {
-		this.strategyOHLInstrumentType = strategyOHLInstrumentType;
+	public void setOhlStrategyInstrumentType(String ohlStrategyInstrumentType) {
+		this.ohlStrategyInstrumentType = ohlStrategyInstrumentType;
 	}
 
-	public String getStrategyOHLExpiryMonth() {
-		return strategyOHLExpiryMonth;
+	public String getOhlStrategyExpiryMonth() {
+		return ohlStrategyExpiryMonth;
 	}
 
-	public void setStrategyOHLExpiryMonth(String strategyOHLExpiryMonth) {
-		this.strategyOHLExpiryMonth = strategyOHLExpiryMonth;
+	public void setOhlStrategyExpiryMonth(String ohlStrategyExpiryMonth) {
+		this.ohlStrategyExpiryMonth = ohlStrategyExpiryMonth;
 	}
 
 	public Map<String, String> getAuthUriMap() {
@@ -205,15 +217,15 @@ public class KiteProperties implements TradebotConstants {
 
 	public void setInstrumentMap(String exchange, List<Instrument> instruments) {
 		instrumentMap.put(exchange, instruments);
-		setTokenMap(instruments);
+		setTradingSymbolMap(instruments);
 	}
 
 	public List<Long> getTokens() {
-		for (Instrument instrument : getInstrumentMap().get(getParameterData().getExchange().get(strategyOHLExchangeIndex))) {
-			if ((StringUtils.isEmpty(strategyOHLInstrumentType)
-					|| instrument.getInstrument_type().equals(strategyOHLInstrumentType))
-					&& (org.apache.commons.lang3.StringUtils.isBlank(strategyOHLExpiryMonth) 
-					|| instrument.getTradingsymbol().contains(strategyOHLExpiryMonth.toUpperCase()))
+		for (Instrument instrument : getInstrumentMap().get(getParameterData().getExchange().get(ohlStrategyExchangeIndex))) {
+			if ((StringUtils.isEmpty(ohlStrategyInstrumentType)
+					|| instrument.getInstrument_type().equals(ohlStrategyInstrumentType))
+					&& (org.apache.commons.lang3.StringUtils.isBlank(ohlStrategyExpiryMonth) 
+					|| instrument.getTradingsymbol().contains(ohlStrategyExpiryMonth.toUpperCase()))
 					&& !instrument.getTradingsymbol().contains(SYMBOL_HYPHEN)) {
 				tokens.add(instrument.getInstrument_token());
 			}
@@ -225,13 +237,13 @@ public class KiteProperties implements TradebotConstants {
 		this.tokens = tokens;
 	}
 
-	public Map<Long, String> getTokenMap() {
-		return tokenMap;
+	public Map<Long, String> getTradingSymbolMap() {
+		return tradingSymbolMap;
 	}
 
-	public void setTokenMap(List<Instrument> instruments) {
+	public void setTradingSymbolMap(List<Instrument> instruments) {
 		for (Instrument instrument : instruments) {
-			tokenMap.put(instrument.getInstrument_token(), instrument.getTradingsymbol());
+			tradingSymbolMap.put(instrument.getInstrument_token(), instrument.getTradingsymbol());
 		}
 	}
 
@@ -258,6 +270,14 @@ public class KiteProperties implements TradebotConstants {
 	public void setOrderActorRoutees(int orderActorRoutees) {
 		this.orderActorRoutees = orderActorRoutees;
 	}
+	
+	public int getTradeableTickDataLoggingInitDelay() {
+		return tradeableTickDataLoggingInitDelay;
+	}
+
+	public void setTradeableTickDataLoggingInitDelay(int tradeableTickDataLoggingInitDelay) {
+		this.tradeableTickDataLoggingInitDelay = tradeableTickDataLoggingInitDelay;
+	}
 
 	public int getTradeableTickDataLoggingInterval() {
 		return tradeableTickDataLoggingInterval;
@@ -265,6 +285,70 @@ public class KiteProperties implements TradebotConstants {
 
 	public void setTradeableTickDataLoggingInterval(int tradeableTickDataLoggingInterval) {
 		this.tradeableTickDataLoggingInterval = tradeableTickDataLoggingInterval;
+	}
+
+	public double getOhlTradeableNLC() {
+		return ohlTradeableNLC;
+	}
+
+	public void setOhlTradeableNLC(double ohlTradeableNLC) {
+		this.ohlTradeableNLC = ohlTradeableNLC;
+	}
+
+	public double getOhlTradeableNHC() {
+		return ohlTradeableNHC;
+	}
+
+	public void setOhlTradeableNHC(double ohlTradeableNHC) {
+		this.ohlTradeableNHC = ohlTradeableNHC;
+	}
+
+	public boolean isEnableOHLTsTbConstraint() {
+		return enableOHLTsTbConstraint;
+	}
+
+	public void setEnableOHLTsTbConstraint(boolean enableOHLTsTbConstraint) {
+		this.enableOHLTsTbConstraint = enableOHLTsTbConstraint;
+	}
+
+	public int getOhlTradeCount() {
+		return ohlTradeCount;
+	}
+
+	public void setOhlTradeCount(int ohlTradeCount) {
+		this.ohlTradeCount = ohlTradeCount;
+	}
+
+	public int getOhlTradeTypePerInstrument() {
+		return ohlTradeTypePerInstrument;
+	}
+
+	public void setOhlTradeTypePerInstrument(int ohlTradeTypePerInstrument) {
+		this.ohlTradeTypePerInstrument = ohlTradeTypePerInstrument;
+	}
+
+	public int getOhlTradeQtyPerInstrument() {
+		return ohlTradeQtyPerInstrument;
+	}
+
+	public void setOhlTradeQtyPerInstrument(int ohlTradeQtyPerInstrument) {
+		this.ohlTradeQtyPerInstrument = ohlTradeQtyPerInstrument;
+	}
+
+	public int getOhlTradeTxnPerInstrument() {
+		return ohlTradeTxnPerInstrument;
+	}
+
+	public void setOhlTradeTxnPerInstrument(int ohlTradeTxnPerInstrument) {
+		this.ohlTradeTxnPerInstrument = ohlTradeTxnPerInstrument;
+	}
+
+	public int getOhlTradeTotalTxn() {
+		return ohlTradeTotalTxn;
+	}
+
+	public void setOhlTradeTotalTxn(int ohlTradeTotalTxn) {
+		this.ohlTradeTotalTxn = ohlTradeTotalTxn;
 	}
 
 }

@@ -1,33 +1,29 @@
 package com.juststocks.tradebot.bean;
 
+import org.apache.commons.math3.util.Precision;
+
 import com.rainmatter.models.Tick;
 
 /**
  * @author bharath_kandasamy
  *
  */
-public class OHLTick extends Tick implements Comparable<OHLTick> {
-	final Tick tick;
+public class OHLTick extends Tick {
+	public final Tick tick;
 
 	public OHLTick(Tick tick) {
 		this.tick = tick;
 	}
 	
 	public double getNetLowChange() {
-		return ((tick.getLastTradedPrice() - tick.getLowPrice()) / tick.getLowPrice());
+		return Precision.round((tick.getLastTradedPrice() - tick.getLowPrice()) / tick.getLowPrice(), 4) * 100;
 	}
 	
 	public double getNetHighChange() {
-		return ((tick.getHighPrice() - tick.getLastTradedPrice()) / tick.getHighPrice());
+		return Precision.round((tick.getHighPrice() - tick.getLastTradedPrice()) / tick.getHighPrice(), 4) * 100;
 	}
 	
 	public boolean isTbGreaterThanTs() {
 		return tick.getTotalBuyQuantity() > tick.getTotalSellQuantity();
 	}
-	
-	@Override
-	public int compareTo(OHLTick ohlTick) {
-		return (int) (tick.getToken() - ohlTick.tick.getToken());
-	}
-	
 }
