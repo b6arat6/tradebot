@@ -4,9 +4,10 @@
 package com.juststocks.tradebot.facade;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
-import com.juststocks.tradebot.constants.KiteOrderParamValuesEnum;
+import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
 import com.juststocks.tradebot.constants.TradebotConstants;
 import com.juststocks.tradebot.exception.AuthException;
 
@@ -36,19 +37,20 @@ public interface TradeSystemFacade extends TradebotConstants {
 	
 	boolean unsubscribeInstruments(ArrayList<Long> tokens);
 	
-	Map<String, Object> buildOrderParamMap(
-			KiteOrderParamValuesEnum exchange,
+	Map<String, Object> buildOrderParamMap(String exchange,
 			String tradingsymbol,
-			KiteOrderParamValuesEnum transaction_type,
+			String transactionType,
 			int quantity,
 			double price,
-			KiteOrderParamValuesEnum product,
-			KiteOrderParamValuesEnum order_type,
-			KiteOrderParamValuesEnum validity,
-			int disclosed_quantity,
-			double trigger_price,
-			double squareoff_value,
-			double stoploss_value,
-			double trailing_stoploss);
+			String product,
+			String orderType,
+			String validity,
+			int disclosedQuantity,
+			double triggerPrice,
+			double squareoffValue,
+			double stoplossValue,
+			double trailingStoploss);
+	
+	<E> boolean placeOHLOrder(Collection<E> ohlTickCollection, final int tradeCount, final ParameterData.ValueIndexEnum transactionType, int ohlSign);
 	
 }

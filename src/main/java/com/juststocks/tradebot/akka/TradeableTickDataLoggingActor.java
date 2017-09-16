@@ -42,14 +42,14 @@ public class TradeableTickDataLoggingActor extends AbstractActor implements Trad
 			LOGGER.info(OL_TICK_MAP_SIZE, olTickMap.size());
 			for (OLTick olTick : olTickMap.values()) {
 				tick = olTick.tick;
-				LOGGER.info(OHL_OL_TICK, kiteProperties.getTradingSymbolMap().get(tick.getToken()), tick.getLastTradedPrice(),
+				LOGGER.info(OHL_OL_TICK, kiteProperties.getTradingInstrumentMap().get(olTick.tick.getToken()).getTradingsymbol(), tick.getLastTradedPrice(),
 						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), olTick.getNetLowChange(),
 						olTick.getNetHighChange(), olTick.isTbGreaterThanTs(), tick.getToken());
 			}
 			LOGGER.info(OH_TICK_MAP_SIZE, ohTickMap.size());
 			for (OHTick ohTick : ohTickMap.values()) {
 				tick = ohTick.tick;
-				LOGGER.info(OHL_OH_TICK, kiteProperties.getTradingSymbolMap().get(tick.getToken()), tick.getLastTradedPrice(),
+				LOGGER.info(OHL_OH_TICK, kiteProperties.getTradingInstrumentMap().get(ohTick.tick.getToken()).getTradingsymbol(), tick.getLastTradedPrice(),
 						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), ohTick.getNetLowChange(),
 						ohTick.getNetHighChange(), !ohTick.isTbGreaterThanTs(), tick.getToken());
 			}

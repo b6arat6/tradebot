@@ -37,7 +37,8 @@ public interface TradebotConstants {
 	
 	public static final String REPLACE_HOLDER_CODE = "<CODE>";
 	public static final String REPLACE_HOLDER_ERROR = "<ERROR>";
-	public static final String EXCEPTION_AUTH = "Authentication failed! Code=<CODE>, Error=<ERROR>";
+	public static final String EXCEPTION_AUTH_KITE = "Authentication failed! Code=<CODE>, Error=<ERROR>";
+	public static final String EXCEPTION_ORDER_KITE = "Order placing failed! I={}, Code=<CODE>, Error=<ERROR>";
 	
 	public static final String BEAN_KITE_CLIENT_FACADE = "kiteConnectClientFacade";
 	public static final String BEAN_APACHE_HTTP_UTIL = "apacheHttpUtil";
@@ -77,6 +78,6 @@ public interface TradebotConstants {
 	public static final String ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
 	public static final String ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING = "LogTradeableTickData";
 	
-	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "52 30 3 * * 0-6";
+	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "15 50 03 * * 0-6";
 	
 }

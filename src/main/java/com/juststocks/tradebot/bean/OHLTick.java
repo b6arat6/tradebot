@@ -8,9 +8,13 @@ import com.rainmatter.models.Tick;
  * @author bharath_kandasamy
  *
  */
-public class OHLTick extends Tick {
+public abstract class OHLTick extends Tick implements Comparable<OHLTick> {
 	public final Tick tick;
-
+	
+	public static boolean totalBuySellConstraintEnabled;
+	
+	public static boolean lenientNLHC;
+	
 	public OHLTick(Tick tick) {
 		this.tick = tick;
 	}

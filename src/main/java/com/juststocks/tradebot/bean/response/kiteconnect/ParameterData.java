@@ -103,19 +103,46 @@ public class ParameterData {
 		return ToStringBuilder.reflectionToString(this);
 	}
 	
-	public static enum IndexEnum {
+	public enum NameEnum {
+		EXCHANGE("exchange"),
+		TRADINGSYMBOL("tradingsymbol"),
+		TRANSACTION_TYPE("transaction_type"),
+		QUANTITY("quantity"),
+		PRICE("price"),
+		PRODUCT("product"),
+		ORDER_TYPE("order_type"),
+		VALIDITY("validity"),
+		DISCLOSED_QUANTITY("disclosed_quantity"),
+		TRIGGER_PRICE("trigger_price"),
+		SQUAREOFF_VALUE("squareoff_value"),
+		STOPLOSS_VALUE("stoploss_value"),
+		TRAILING_STOPLOSS("trailing_stoploss"),
+		VARIETY("variety");
+		
+		String name;
+		
+		NameEnum(String name) {
+			this.name = name;
+		}
+		
+		public String getName() {
+			return name;
+		}
+	}
+	
+	public static enum ValueIndexEnum {
 		ORDER_VARIETY_REGULAR(0), ORDER_VARIETY_AMO(1), ORDER_VARIETY_BO(2), ORDER_VARIETY_CO(3)
-		, SEGMENT_EQUITY(0)
+		, SEGMENT_EQUITY(0), SEGMENT_COMMODITY(1)
 		, TRANSACTION_TYPE_BUY(0), TRANSACTION_TYPE_SELL(1)
 		, ORDER_TYPE_MARKET(0), ORDER_TYPE_LIMIT(1), ORDER_TYPE_SL(2), ORDER_TYPE_SL_M(3)
-		, POSITION_TYPE_DAY(0)
-		, VALIDITY_DAY(0)
-		, PRODUCT_NRML(0), PRODUCT_CNC(1), PRODUCT_CO(2), PRODUCT_BO(3)
-		, EXCHANGE_NSE(0), EXCHANGE_BSE(1), EXCHANGE_NFO(2);
+		, POSITION_TYPE_DAY(0), POSITION_TYPE_OVERNIGHT(1)
+		, VALIDITY_DAY(0), VALIDITY_IOC(1), VALIDITY_GTC(2), VALIDITY_AMO(3)
+		, PRODUCT_NRML(0), PRODUCT_MIS(1), PRODUCT_CNC(2), PRODUCT_CO(3), PRODUCT_BO(4)
+		, EXCHANGE_NSE(0), EXCHANGE_BSE(1), EXCHANGE_NFO(2), EXCHANGE_CDS(3), EXCHANGE_MCX(4), EXCHANGE_MCXSX(5), EXCHANGE_BFO(6);
 		
 		int index;
 		
-		IndexEnum(int index) {
+		ValueIndexEnum(int index) {
 			this.index = index;
 		}
 		

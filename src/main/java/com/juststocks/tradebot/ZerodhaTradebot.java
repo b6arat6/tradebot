@@ -64,11 +64,11 @@ public class ZerodhaTradebot implements Tradebot {
 					if (tradeSystemFacade.loadParameters()) {
 						LOGGER.info(PARAMETER_LOAD_SUCCESS);
 						if (tradeSystemFacade.getInstruments(
-								properties.getParameterData().getExchange().get(properties.getOhlStrategyExchangeIndex()))) {
+								properties.getParameterData().getExchange().get(properties.getOhlStrategyExchangeValueIndex()))) {
 							LOGGER.info(EXCHANGE_INSTRUMENTS_GET_SUCCESS);
 							if (tradeSystemFacade.initWebSocket()) {
 								LOGGER.info(WEB_SOCKECT_INIT_SUCCESS);
-								if (tradeSystemFacade.subscribeInstruments((ArrayList<Long>) properties.getTokens())) {
+								if (tradeSystemFacade.subscribeInstruments((ArrayList<Long>) properties.getTradingTokens())) {
 									LOGGER.info(INSTRUMENTS_SUBSCRIPTION_SUCCESS);
 								}
 							}

@@ -51,12 +51,12 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 			if (!nonOHLTickSet.contains(tick.getToken())) {
 				if (olTick.isOL()) {
 					if (olTickMap.containsKey(tick.getToken()) && olTickMap.put(tick.getToken(), olTick) != null) {
-						LOGGER.info(STRATEGY_OHL_OL_UPDATED, kiteProperties.getTradingSymbolMap().get(tick.getToken()),
+						LOGGER.info(STRATEGY_OHL_OL_UPDATED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
 					} else {
-						LOGGER.info(STRATEGY_OHL_OL, kiteProperties.getTradingSymbolMap().get(tick.getToken()),
+						LOGGER.info(STRATEGY_OHL_OL, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
@@ -64,12 +64,12 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 					}
 				} else if (ohTick.isOH()) {
 					if (ohTickMap.containsKey(tick.getToken()) && ohTickMap.put(tick.getToken(), ohTick) != null) {
-						LOGGER.info(STRATEGY_OHL_OH_UPDATED, kiteProperties.getTradingSymbolMap().get(tick.getToken()),
+						LOGGER.info(STRATEGY_OHL_OH_UPDATED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
 					} else {
-						LOGGER.info(STRATEGY_OHL_OH, kiteProperties.getTradingSymbolMap().get(tick.getToken()),
+						LOGGER.info(STRATEGY_OHL_OH, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
@@ -77,17 +77,17 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 					}
 				} else {
 					if (olTickMap.containsKey(tick.getToken()) && olTickMap.remove(tick.getToken()) != null) {
-						LOGGER.warn(STRATEGY_OHL_OL_REMOVED, kiteProperties.getTradingSymbolMap().get(tick.getToken()), tick.getToken(),
+						LOGGER.warn(STRATEGY_OHL_OL_REMOVED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
 					} else if (ohTickMap.containsKey(tick.getToken()) && ohTickMap.remove(tick.getToken()) != null) {
-						LOGGER.warn(STRATEGY_OHL_OH_REMOVED, kiteProperties.getTradingSymbolMap().get(tick.getToken()), tick.getToken(),
+						LOGGER.warn(STRATEGY_OHL_OH_REMOVED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
 					}
-					LOGGER.info(INSTRUMENT_UNSUBSCRIBING, kiteProperties.getTradingSymbolMap().get(tick.getToken()), tick.getToken());
+					LOGGER.info(INSTRUMENT_UNSUBSCRIBING, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken());
 					nonOHLTickSet.add(tick.getToken());
 					unsubscribeTicks.add(tick.getToken());
 				}

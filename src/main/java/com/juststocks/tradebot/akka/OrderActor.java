@@ -3,18 +3,17 @@
  */
 package com.juststocks.tradebot.akka;
 
-import static com.juststocks.tradebot.bean.KiteProperties.*;
+import static com.juststocks.tradebot.bean.KiteProperties.ohTickMap;
+import static com.juststocks.tradebot.bean.KiteProperties.olTickMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.juststocks.tradebot.bean.KiteProperties;
-import com.juststocks.tradebot.bean.OLTick;
-import com.juststocks.tradebot.constants.KiteOrderParamValuesEnum;
+import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
+import com.juststocks.tradebot.constants.OHLStrategyEnum;
 import com.juststocks.tradebot.constants.TradebotConstants;
 import com.juststocks.tradebot.facade.KiteTradeSystemFacade;
-import com.rainmatter.kitehttp.exceptions.KiteException;
-import com.rainmatter.models.IndicesQuote;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
@@ -33,7 +32,7 @@ public class OrderActor extends AbstractActor implements TradebotConstants {
 	
 	private KiteProperties kiteProperties;
 	
-	private KiteTradeSystemFacade kiteTradeSystemFacade;	
+	private KiteTradeSystemFacade kiteTradeSystemFacade;
 	
 	public OrderActor(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
 		this.kiteProperties = kiteProperties;
@@ -45,45 +44,23 @@ public class OrderActor extends AbstractActor implements TradebotConstants {
 		return receiveBuilder().match(String.class, orderType -> {
 			if (orderType.equals(ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY)) {
 				LOGGER.info(TRADE_TYPE_OHL_STRATEGY_TRIGGERED);
-				int olTradeCount = 0;
-				IndicesQuote indicesQuote;
-				for (OLTick olTick : olTickMap.values()) {
-					if (olTick.isOL()) {
-						indicesQuote = kiteTradeSystemFacade.<IndicesQuote> getQuoteIndices(olTick.tick.getToken());
-						olTick.setLastTradedPrice(indicesQuote.lastPrice);
-						if (olTick.getNetLowChange() < kiteProperties.getOhlTradeableNLC()
-								&& olTick.getNetHighChange() < kiteProperties.getOhlTradeableNHC()
-								&& (!kiteProperties.isEnableOHLTsTbConstraint()) || olTick.isTbGreaterThanTs()) {
-							try {
-								kiteTradeSystemFacade.getKiteConnect().placeOrder(
-										kiteTradeSystemFacade.buildOrderParamMap(
-												KiteOrderParamValuesEnum.EXCHANGE_NSE
-												, kiteProperties.getTradingSymbolMap().get(olTick.tick.getToken())
-												, KiteOrderParamValuesEnum.TRANSACTION_TYPE_BUY
-												, 1
-												, indicesQuote.lastPrice + 1
-												, KiteOrderParamValuesEnum.PRODUCT_MIS
-												, KiteOrderParamValuesEnum.ORDER_TYPE_NRML
-												, KiteOrderParamValuesEnum.VALIDITY_IOC
-												, -1
-												, -1
-												, -1
-												, -1
-												, -1)
-								, KiteOrderParamValuesEnum.VARIETY_REGULAR.toString());
-								olTradeCount++;
-								if (olTradeCount <= kiteProperties.getOhlTradeCount()) {
-									break;
-								}
-							} catch (KiteException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					}
+				if (kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OHL.getValue())
+						|| kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OL.getValue())) {
+					kiteTradeSystemFacade.placeOHLOrder(
+							olTickMap.values()
+							, kiteProperties.getOhlOLTradeCount()
+							, ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY
+							, 1);
+				}
+				if (kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OHL.getValue())
+						|| kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OH.getValue())) {
+					kiteTradeSystemFacade.placeOHLOrder(
+							ohTickMap.values()
+							, kiteProperties.getOhlOHTradeCount()
+							, ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL
+							, -1);
 				}
 			}
 		}).build();
 	}
-
 }
