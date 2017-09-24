@@ -5,12 +5,12 @@ package com.juststocks.tradebot.bean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -26,9 +26,10 @@ import com.rainmatter.models.Instrument;
 @ConfigurationProperties("com.juststocks.tradebot.kite")
 public class KiteProperties implements TradebotConstants {
 	
-	public static SortedMap<Long, OLTick> olTickMap = new ConcurrentSkipListMap<>();
-	public static SortedMap<Long, OHTick> ohTickMap = new ConcurrentSkipListMap<>();
-	public static Set<Long> nonOHLTickSet = new ConcurrentSkipListSet<>();
+	public static Map<OLTick, Long> olTickMap = new ConcurrentSkipListMap<>();
+	public static Map<OHTick, Long> ohTickMap = new ConcurrentSkipListMap<>();
+	public static Set<Long> nonOHLTickSet = new HashSet<>();
+	public static Map<Long, String> orderedTickMap = new LinkedHashMap<>();
 	
 	private String userId;
 	
@@ -87,8 +88,6 @@ public class KiteProperties implements TradebotConstants {
 	private double ohlTradeableNHC;
 	
 	private boolean ohlTotalBuySellConstraintEnabled;
-	
-	private boolean lenientOhlNLHC;
 	
 	private int ohlOLTradeCount;
 	
@@ -369,15 +368,6 @@ public class KiteProperties implements TradebotConstants {
 	public void setOhlTotalBuySellConstraintEnabled(boolean ohlTotalBuySellConstraintEnabled) {
 		OHLTick.totalBuySellConstraintEnabled = ohlTotalBuySellConstraintEnabled;
 		this.ohlTotalBuySellConstraintEnabled = ohlTotalBuySellConstraintEnabled;
-	}
-
-	public boolean isLenientOhlNLHC() {
-		return lenientOhlNLHC;
-	}
-
-	public void setLenientOhlNLHC(boolean lenientOhlNLHC) {
-		OHLTick.lenientNLHC = lenientOhlNLHC;
-		this.lenientOhlNLHC = lenientOhlNLHC;
 	}
 
 	public int getOhlOLTradeCount() {

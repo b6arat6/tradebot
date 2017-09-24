@@ -13,21 +13,24 @@ public abstract class OHLTick extends Tick implements Comparable<OHLTick> {
 	
 	public static boolean totalBuySellConstraintEnabled;
 	
-	public static boolean lenientNLHC;
-	
 	public OHLTick(Tick tick) {
 		this.tick = tick;
 	}
 	
 	public double getNetLowChange() {
-		return Precision.round((tick.getLastTradedPrice() - tick.getLowPrice()) / tick.getLowPrice(), 4) * 100;
+		return Precision.round((tick.getLastTradedPrice() - tick.getLowPrice()) / tick.getLowPrice(), 6) * 100;
 	}
 	
 	public double getNetHighChange() {
-		return Precision.round((tick.getHighPrice() - tick.getLastTradedPrice()) / tick.getHighPrice(), 4) * 100;
+		return Precision.round((tick.getHighPrice() - tick.getLastTradedPrice()) / tick.getHighPrice(), 6) * 100;
 	}
 	
 	public boolean isTbGreaterThanTs() {
 		return tick.getTotalBuyQuantity() > tick.getTotalSellQuantity();
 	}
+	
+	public double getTotalNetLowHighChange() {
+		return Precision.round(getNetLowChange() + getNetHighChange(), 6);
+	}
+	
 }

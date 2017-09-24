@@ -15,22 +15,16 @@ public class OLTick extends OHLTick {
 		return tick.getOpenPrice() == tick.getLowPrice();
 	}
 	
-	@Override
 	public int compareTo(OHLTick o) {
 		OLTick otherTick = (OLTick) o;
-		if (tick.getToken() == otherTick.getToken()) {
+		if (tick.getToken() == otherTick.tick.getToken()) {
 			return 0;
-		} else if (!lenientNLHC
-				&& getNetLowChange() < o.getNetLowChange()
-				&& getNetHighChange() < o.getNetHighChange()
-				&& (!totalBuySellConstraintEnabled || isTbGreaterThanTs())) {
-			return -1;
-		} else if (lenientNLHC
-				&& (getNetLowChange() < o.getNetLowChange() || getNetHighChange() < o.getNetHighChange())
+		} else if (getTotalNetLowHighChange() < otherTick.getTotalNetLowHighChange()
 				&& (!totalBuySellConstraintEnabled || isTbGreaterThanTs())) {
 			return -1;
 		} else {
 			return 1;
 		}
 	}
+	
 }

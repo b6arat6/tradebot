@@ -40,19 +40,20 @@ public class TradeableTickDataLoggingActor extends AbstractActor implements Trad
 		return receiveBuilder().match(String.class, message -> {
 			Tick tick;
 			LOGGER.info(OL_TICK_MAP_SIZE, olTickMap.size());
-			for (OLTick olTick : olTickMap.values()) {
+			for (OLTick olTick : olTickMap.keySet()) {
 				tick = olTick.tick;
 				LOGGER.info(OHL_OL_TICK, kiteProperties.getTradingInstrumentMap().get(olTick.tick.getToken()).getTradingsymbol(), tick.getLastTradedPrice(),
-						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), olTick.getNetLowChange(),
+						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), olTick.getTotalNetLowHighChange(), olTick.getNetLowChange(),
 						olTick.getNetHighChange(), olTick.isTbGreaterThanTs(), tick.getToken());
 			}
 			LOGGER.info(OH_TICK_MAP_SIZE, ohTickMap.size());
-			for (OHTick ohTick : ohTickMap.values()) {
+			for (OHTick ohTick : ohTickMap.keySet()) {
 				tick = ohTick.tick;
 				LOGGER.info(OHL_OH_TICK, kiteProperties.getTradingInstrumentMap().get(ohTick.tick.getToken()).getTradingsymbol(), tick.getLastTradedPrice(),
-						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), ohTick.getNetLowChange(),
+						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), ohTick.getTotalNetLowHighChange(), ohTick.getNetLowChange(),
 						ohTick.getNetHighChange(), !ohTick.isTbGreaterThanTs(), tick.getToken());
 			}
+			LOGGER.info(NON_OHL_TICK_SET_SIZE, nonOHLTickSet.size());
 		}).build();
 	}
 

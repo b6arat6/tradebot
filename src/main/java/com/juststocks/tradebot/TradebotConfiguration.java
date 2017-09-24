@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.juststocks.tradebot.akka.OHLStrategyActor;
-import com.juststocks.tradebot.akka.OrderActor;
+import com.juststocks.tradebot.akka.OrderGeneratorActor;
+import com.juststocks.tradebot.akka.OrderMonitorActor;
 import com.juststocks.tradebot.akka.TickDispenserActor;
 import com.juststocks.tradebot.akka.TradeableTickDataLoggingActor;
 import com.juststocks.tradebot.bean.KiteProperties;
@@ -65,9 +66,9 @@ public class TradebotConfiguration implements TradebotConstants {
 				.withRouter(new SmallestMailboxPool(kiteProperties.getTickDisperserActorRoutees())));
 	}
 	
-	@Bean(name=AKKA_ORDER_ACTOR_REF)
-	public ActorRef orderActor() {
-		return actorSystem.actorOf(OrderActor.props(kiteProperties, kiteTradeSystemFacade)
+	@Bean(name=AKKA_ORDER_GENERATOR_ACTOR_REF)
+	public ActorRef orderGeneratorActor() {
+		return actorSystem.actorOf(OrderGeneratorActor.props(kiteProperties, kiteTradeSystemFacade)
 				.withRouter(new SmallestMailboxPool(kiteProperties.getOrderActorRoutees())));
 	}
 	

@@ -3,8 +3,10 @@
  */
 package com.juststocks.tradebot.akka;
 
+import static com.juststocks.tradebot.bean.KiteProperties.nonOHLTickSet;
+import static com.juststocks.tradebot.bean.KiteProperties.orderedTickMap;
+
 import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +44,10 @@ public class TickDispenserActor extends AbstractActor implements TradebotConstan
 	public Receive createReceive() {
 		return receiveBuilder().match(MyArrayList.class, myArrayList -> {
 			for (Tick tick : myArrayList.ticks) {
-				ohlTradeStrategyActorRef.tell(tick, ActorRef.noSender());
+				if (!nonOHLTickSet.contains(tick.getToken())
+						&& !orderedTickMap.containsKey(tick.getToken())) {
+					ohlTradeStrategyActorRef.tell(tick, ActorRef.noSender());
+				}
 			}
 		}).build();
 	}

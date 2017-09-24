@@ -3,8 +3,7 @@
  */
 package com.juststocks.tradebot.akka;
 
-import static com.juststocks.tradebot.bean.KiteProperties.ohTickMap;
-import static com.juststocks.tradebot.bean.KiteProperties.olTickMap;
+import static com.juststocks.tradebot.bean.KiteProperties.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,19 +21,19 @@ import akka.actor.Props;
  * @author bharath_kandasamy
  *
  */
-public class OrderActor extends AbstractActor implements TradebotConstants {
+public class OrderGeneratorActor extends AbstractActor implements TradebotConstants {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_ORDER);
 	
 	public static Props props(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
-		return Props.create(OrderActor.class, () -> new OrderActor(kiteProperties, kiteTradeSystemFacade));
+		return Props.create(OrderGeneratorActor.class, () -> new OrderGeneratorActor(kiteProperties, kiteTradeSystemFacade));
 	}
 	
 	private KiteProperties kiteProperties;
 	
 	private KiteTradeSystemFacade kiteTradeSystemFacade;
 	
-	public OrderActor(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
+	public OrderGeneratorActor(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
 		this.kiteProperties = kiteProperties;
 		this.kiteTradeSystemFacade = kiteTradeSystemFacade;
 	}
@@ -47,7 +46,7 @@ public class OrderActor extends AbstractActor implements TradebotConstants {
 				if (kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OHL.getValue())
 						|| kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OL.getValue())) {
 					kiteTradeSystemFacade.placeOHLOrder(
-							olTickMap.values()
+							olTickMap.keySet()
 							, kiteProperties.getOhlOLTradeCount()
 							, ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY
 							, 1);
@@ -55,7 +54,7 @@ public class OrderActor extends AbstractActor implements TradebotConstants {
 				if (kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OHL.getValue())
 						|| kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OH.getValue())) {
 					kiteTradeSystemFacade.placeOHLOrder(
-							ohTickMap.values()
+							ohTickMap.keySet()
 							, kiteProperties.getOhlOHTradeCount()
 							, ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL
 							, -1);

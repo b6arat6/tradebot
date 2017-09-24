@@ -59,8 +59,9 @@ public interface TradebotConstants {
 	public static final String AKKA_ACTOR_SYSTEM = "TradebotAkkaActorSystem";
 	public static final String AKKA_OHL_STRATEGY_ACTOR_REF = "OHLStrategyActorRef";
 	public static final String AKKA_TICK_DISPENSER_ACTOR_REF = "TickDispenserActorRef";
-	public static final String AKKA_ORDER_ACTOR_REF = "OrderActorRef";
+	public static final String AKKA_ORDER_GENERATOR_ACTOR_REF = "OrderGeneratorActorRef";
 	public static final String AKKA_TRADEABLE_TICK_DATA_LOGGING_ACTOR_CANCELLABLE = "TradeableTickDataLoggingActorCancellable";
+	public static final String AKKA_ORDER_MONITOR_ACTOR_REF = "OrderMonitorActorRef";
 
 	public static final String STRATEGY_OHL_OL = "O=L, B(+), I={}, LTP={}, L={}, O={}, H={}, T={}";
 	public static final String STRATEGY_OHL_OH = "O=H, S(-), I={}, LTP={}, L={}, O={}, H={}, T={}";
@@ -72,12 +73,12 @@ public interface TradebotConstants {
 	public static final String OH_TICK_MAP_SIZE = "OHTickMap, Size={}";
 	public static final String NON_OHL_TICK_SET_SIZE = "NonOHLTickSet, Size={}";
 	
-	public static final String OHL_OL_TICK = "O=L, I={}, LTP={}, L={}, O={}, H={}, NLC={}, NHC={}, Tb>Ts={}, T={}";
-	public static final String OHL_OH_TICK = "O=H, I={}, LTP={}, L={}, O={}, H={}, NLC={}, NHC={}, Ts>Tb={}, T={}";
+	public static final String OHL_OL_TICK = "O=L, I={}, LTP={}, L={}, O={}, H={}, NLHC={}, NLC={}, NHC={}, Tb>Ts={}, T={}";
+	public static final String OHL_OH_TICK = "O=H, I={}, LTP={}, L={}, O={}, H={}, NLHC={}, NLC={}, NHC={}, Ts>Tb={}, T={}";
 	
 	public static final String ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
 	public static final String ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING = "LogTradeableTickData";
-	
-	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "15 50 03 * * 0-6";
+	// ss mm hh * * dd
+	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "10 32 00 * * 0-6";
 	
 }
