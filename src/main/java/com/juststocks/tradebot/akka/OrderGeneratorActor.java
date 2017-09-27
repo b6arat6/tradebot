@@ -5,6 +5,8 @@ package com.juststocks.tradebot.akka;
 
 import static com.juststocks.tradebot.bean.KiteProperties.*;
 
+import java.util.TreeSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +48,7 @@ public class OrderGeneratorActor extends AbstractActor implements TradebotConsta
 				if (kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OHL.getValue())
 						|| kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OL.getValue())) {
 					kiteTradeSystemFacade.placeOHLOrder(
-							olTickMap.keySet()
+							new TreeSet<>(olTickMap.values())
 							, kiteProperties.getOhlOLTradeCount()
 							, ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY
 							, 1);
@@ -54,7 +56,7 @@ public class OrderGeneratorActor extends AbstractActor implements TradebotConsta
 				if (kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OHL.getValue())
 						|| kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OH.getValue())) {
 					kiteTradeSystemFacade.placeOHLOrder(
-							ohTickMap.keySet()
+							new TreeSet<>(ohTickMap.values())
 							, kiteProperties.getOhlOHTradeCount()
 							, ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL
 							, -1);

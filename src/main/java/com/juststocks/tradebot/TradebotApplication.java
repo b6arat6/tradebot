@@ -33,7 +33,7 @@ public class TradebotApplication implements TradebotConstants, ExitCodeGenerator
 	private ActorSystem actorSystem;
 	
 	@Autowired
-	@Qualifier(AKKA_TRADEABLE_TICK_DATA_LOGGING_ACTOR_CANCELLABLE)
+	@Qualifier(BEAN_AKKA_TRADEABLE_TICK_DATA_LOGGING_ACTOR_CANCELLABLE)
 	Cancellable tradeableTickDataLoggingActorCancellable;
 	
 	private class ShutdownHook extends Thread {

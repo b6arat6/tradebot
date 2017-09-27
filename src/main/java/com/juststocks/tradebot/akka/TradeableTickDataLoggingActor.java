@@ -3,6 +3,11 @@
  */
 package com.juststocks.tradebot.akka;
 
+import static com.juststocks.tradebot.bean.KiteProperties.*;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +19,6 @@ import com.rainmatter.models.Tick;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
-
-import static com.juststocks.tradebot.bean.KiteProperties.*;
 
 /**
  * @author bharath_kandasamy
@@ -39,21 +42,24 @@ public class TradeableTickDataLoggingActor extends AbstractActor implements Trad
 	public Receive createReceive() {
 		return receiveBuilder().match(String.class, message -> {
 			Tick tick;
-			LOGGER.info(OL_TICK_MAP_SIZE, olTickMap.size());
-			for (OLTick olTick : olTickMap.keySet()) {
+			SortedSet<OLTick> olTickSortedSet = new TreeSet<>(olTickMap.values());
+			LOGGER.info(OL_TICK_SET_SIZE, olTickSortedSet.size());
+			for (OLTick olTick : olTickSortedSet) {
 				tick = olTick.tick;
 				LOGGER.info(OHL_OL_TICK, kiteProperties.getTradingInstrumentMap().get(olTick.tick.getToken()).getTradingsymbol(), tick.getLastTradedPrice(),
 						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), olTick.getTotalNetLowHighChange(), olTick.getNetLowChange(),
 						olTick.getNetHighChange(), olTick.isTbGreaterThanTs(), tick.getToken());
 			}
-			LOGGER.info(OH_TICK_MAP_SIZE, ohTickMap.size());
-			for (OHTick ohTick : ohTickMap.keySet()) {
+			SortedSet<OHTick> ohTickSortedSet = new TreeSet<>(ohTickMap.values());
+			LOGGER.info(OH_TICK_SET_SIZE, ohTickSortedSet.size());
+			for (OHTick ohTick : ohTickSortedSet) {
 				tick = ohTick.tick;
 				LOGGER.info(OHL_OH_TICK, kiteProperties.getTradingInstrumentMap().get(ohTick.tick.getToken()).getTradingsymbol(), tick.getLastTradedPrice(),
 						tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(), ohTick.getTotalNetLowHighChange(), ohTick.getNetLowChange(),
 						ohTick.getNetHighChange(), !ohTick.isTbGreaterThanTs(), tick.getToken());
 			}
 			LOGGER.info(NON_OHL_TICK_SET_SIZE, nonOHLTickSet.size());
+			LOGGER.info(OL_OH_NON_OHL_TICK_SET_SIZE, olTickSortedSet.size() + ohTickSortedSet.size() + nonOHLTickSet.size());
 		}).build();
 	}
 

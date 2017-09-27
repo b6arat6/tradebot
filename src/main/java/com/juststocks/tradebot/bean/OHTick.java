@@ -16,8 +16,7 @@ public class OHTick extends OHLTick {
 	}
 	
 	@Override
-	public int compareTo(OHLTick o) {
-		OHTick otherTick = (OHTick) o;
+	public int compareTo(OHLTick otherTick) {
 		if (tick.getToken() == otherTick.tick.getToken()) {
 			return 0;
 		} else if (getTotalNetLowHighChange() < otherTick.getTotalNetLowHighChange()

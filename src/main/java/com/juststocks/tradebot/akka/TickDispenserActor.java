@@ -25,12 +25,14 @@ import akka.actor.Props;
  */
 public class TickDispenserActor extends AbstractActor implements TradebotConstants {
 	
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
 	
 	public static Props props(KiteProperties kiteProperties, ActorRef ohlTradeStrategyActorRef) {
 		return Props.create(TickDispenserActor.class, () -> new TickDispenserActor(kiteProperties, ohlTradeStrategyActorRef));
 	}
 
+	@SuppressWarnings("unused")
 	private KiteProperties kiteProperties;
 	
 	private ActorRef ohlTradeStrategyActorRef;

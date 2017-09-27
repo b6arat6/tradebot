@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.util.Precision;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import com.juststocks.tradebot.bean.response.kiteconnect.KiteResponse;
 import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
 import com.juststocks.tradebot.constants.OHLStrategyEnum;
 import com.juststocks.tradebot.exception.AuthException;
-import com.juststocks.tradebot.util.ApacheHttpUtil;
 import com.juststocks.tradebot.util.SpringRestTemplateUtil;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.rainmatter.kiteconnect.KiteConnect;
@@ -61,9 +61,6 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	public KiteProperties properties;
 
 	@Autowired
-	public ApacheHttpUtil apacheHttpUtil;
-
-	@Autowired
 	private SpringRestTemplateUtil springRestTemplateUtil;
 
 	private KiteConnect kiteConnect;
@@ -73,11 +70,11 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	public boolean webSocketConnected;
 
 	@Autowired
-	@Qualifier(AKKA_TICK_DISPENSER_ACTOR_REF)
+	@Qualifier(BEAN_AKKA_TICK_DISPENSER_ACTOR_REF)
 	private ActorRef tickDispenserActorRef;
 
 	@Autowired
-	@Qualifier(AKKA_ORDER_GENERATOR_ACTOR_REF)
+	@Qualifier(BEAN_AKKA_ORDER_GENERATOR_ACTOR_REF)
 	private ActorRef orderActorRef;
 
 	public KiteConnect getKiteConnect() {
@@ -112,12 +109,6 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 			MAIN_LOGGER.info(KITE_CONNECT_AT_PT, userModel.accessToken, userModel.publicToken);
 			MAIN_LOGGER.info(METHOD_EXIT);
 			return false;
-			// TODO
-			// kiteConnect.setAccessToken(userModel.accessToken);
-			// kiteConnect.setPublicToken(userModel.publicToken);
-			//
-			// properties.setAccessToken(userModel.accessToken);
-			// properties.setPublicToken(userModel.publicToken);
 		} else {
 			kiteConnect.setAccessToken(properties.getAccessToken());
 			kiteConnect.setPublicToken(properties.getPublicToken());
@@ -188,8 +179,9 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (KiteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ORDER_LOGGER.error(EXCEPTION_KITE.replace(REPLACE_HOLDER_CODE, String.valueOf(e.code))
+					.replace(REPLACE_HOLDER_ERROR, e.message)
+					, properties.getTradingInstrumentMap().get(token).getTradingsymbol());
 		}
 		return (T) indicesQuote;
 	}
@@ -202,6 +194,8 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		kiteTicker.setOnConnectedListener(this);
 		kiteTicker.setOnDisconnectedListener(this);
 		kiteTicker.setOnTickerArrivalListener(this);
+		kiteTicker.setTryReconnection(true);
+		kiteTicker.setMaxRetries(-1);
 		try {
 			kiteTicker.connect();
 			connected = true;
@@ -231,6 +225,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		try {
 			kiteTicker.setMode(tokens, KiteTicker.modeFull);
 			kiteTicker.subscribe(tokens);
+			kiteTicker.setMode(tokens, KiteTicker.modeFull);
 			subscribed = true;
 			MAIN_LOGGER.debug(INSTRUMENTS_SUBSCRIBED, tokens.size(), tokens.toString());
 		} catch (IOException e) {
@@ -331,27 +326,41 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		double squareoffValue = -1;
 		double stoplossValue = -1;
 		double trailingStoploss = -1;
+		Order order = null;
 		List<Long> unsubscribeTicks = new ArrayList<>();
 		for (OHLTick ohlTick : (Collection<OHLTick>) ohlTickCollection) {
 			tick = ohlTick.tick;
-			if (++tradedCount > tradeCount) {
-				break;
-			}
 			indicesQuote = this.<IndicesQuote> getQuoteIndices(tick.getToken());
 			tick.setLastTradedPrice(indicesQuote.lastPrice);
+			try {
+				Thread.sleep(350);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (!(tick.getLastTradedPrice() >= properties.getOhlTradeMinInstrumentPrice()
+					&& tick.getLastTradedPrice() <= properties.getOhlTradeMaxInstrumentPrice()
+					&& ohlTick.getNetLowChange() <= properties.getOhlTradeableNLC()
+					&& ohlTick.getNetHighChange() <= properties.getOhlTradeableNHC())) {
+				continue;
+			}
+			if (nonOHLTickSet.contains(tick.getToken())
+					|| orderedTickMap.containsKey(tick.getToken())) {
+				continue;
+			}
 			if (properties.getOhlTradeOrderTypeValueIndex() == ParameterData.ValueIndexEnum.ORDER_TYPE_LIMIT.getIndex()) {
-//				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()) {
-//					price = tick.getMarketDepth()
-//							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()).toLowerCase())
-//							.get(0)
-//							.getPrice();
-//				}
-//				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()) {
-//					price = tick.getMarketDepth()
-//							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()).toLowerCase())
-//							.get(0)
-//							.getPrice();
-//				}
+				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()) {
+					price = tick.getMarketDepth()
+							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()).toLowerCase())
+							.get(0)
+							.getPrice();
+				}
+				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()) {
+					price = tick.getMarketDepth()
+							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()).toLowerCase())
+							.get(0)
+							.getPrice();
+				}
 			}
 			if (properties.getOhlStrategyInstrumentType().equals(OHLStrategyEnum.INSTRUMENT_TYPE_EQ.getValue())) {
 				if (properties.getOhlTradeType() == Integer.valueOf(OHLStrategyEnum.TRADE_TYPE_QUANTITY.getValue())) {
@@ -366,25 +375,20 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 				tradeQuantity = properties.getTradingInstrumentMap().get(tick.getToken()).getLot_size();
 			}
 			if (properties.getOhlTradeOrderVarietyValueIndex() == ParameterData.ValueIndexEnum.ORDER_VARIETY_BO.getIndex()) {
-				squareoffValue = tick.getLastTradedPrice() * properties.getOhlTradeBOTargetPercent() / 100;
-				stoplossValue = Math.abs(tick.getLastTradedPrice() - (tick.getOpenPrice() - (ohlSign * properties.getOhlTradeBOExtraStoploss())));
+				squareoffValue = price * properties.getOhlTradeBOTargetPercent() / 100;
+				squareoffValue = Precision.round(Precision.round(squareoffValue, 1) + 0.05, 2);
+				stoplossValue = Math.abs(price - (tick.getOpenPrice() - (ohlSign * properties.getOhlTradeBOExtraStoploss())));
+				stoplossValue = Precision.round(Precision.round(stoplossValue, 1) - (ohlSign * 0.05), 2);
 				trailingStoploss = properties.getOhlTradeBOTrailingStoploss();
 			}
-			price = tick.getLastTradedPrice();
 			try {
-				if (!(properties.getOhlTradeMinInstrumentPrice() >= tick.getLastTradedPrice()
-						&& properties.getOhlTradeMaxInstrumentPrice() <= tick.getLastTradedPrice()
-						&& ohlTick.getNetLowChange() <= properties.getOhlTradeableNLC()
-						&& ohlTick.getNetHighChange() <= properties.getOhlTradeableNHC())) {
-					continue;
-				}
-				Order order = kiteConnect.placeOrder(
+				order = kiteConnect.placeOrder(
 						buildOrderParamMap(
 								properties.getParameterData().getExchange().get(properties.getOhlStrategyExchangeValueIndex())
 								, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
 								, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
 								, tradeQuantity
-								, price + 1
+								, price
 								, properties.getParameterData().getProduct().get(ParameterData.ValueIndexEnum.PRODUCT_MIS.getIndex())
 								, properties.getParameterData().getOrderType().get(ParameterData.ValueIndexEnum.ORDER_TYPE_LIMIT.getIndex())
 								, properties.getParameterData().getValidity().get(ParameterData.ValueIndexEnum.VALIDITY_IOC.getIndex())
@@ -393,15 +397,52 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 								, squareoffValue
 								, stoplossValue
 								, trailingStoploss)
-				, properties.getParameterData().getOrderVariety().get(ParameterData.ValueIndexEnum.ORDER_VARIETY_REGULAR.getIndex()));
-				orderedTickMap.put(tick.getToken(), order.orderId);
-				olTickMap.remove(ohlTick);
-				ohTickMap.remove(ohlTick);
-				unsubscribeTicks.add(tick.getToken());
+				, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()));
+				try {
+					Thread.sleep(350);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (order != null) {
+					tradedCount++;
+					orderedTickMap.put(tick.getToken(), order.orderId);
+					olTickMap.remove(tick.getToken());
+					ohTickMap.remove(tick.getToken());
+					unsubscribeTicks.add(tick.getToken());
+					ORDER_LOGGER.info(ORDER_GENERATED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol().toUpperCase()
+							, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
+							, tradeQuantity
+							, price
+							, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex())
+							, squareoffValue
+							, stoplossValue
+							, trailingStoploss);
+				} else {
+					ORDER_LOGGER.info(ORDER_GENERATION_FAILED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
+							, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
+							, tradeQuantity
+							, price
+							, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()).toUpperCase()
+							, squareoffValue
+							, stoplossValue
+							, trailingStoploss);
+				}
+				if (tradedCount >= tradeCount) {
+					break;
+				}
 			} catch (KiteException e) {
 				ORDER_LOGGER.error(EXCEPTION_ORDER_KITE.replace(REPLACE_HOLDER_CODE, String.valueOf(e.code))
 						.replace(REPLACE_HOLDER_ERROR, e.message)
 						, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol());
+				ORDER_LOGGER.info(ORDER_GENERATION_FAILED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
+						, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
+						, tradeQuantity
+						, price
+						, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()).toUpperCase()
+						, squareoffValue
+						, stoplossValue
+						, trailingStoploss);
 			}
 		}
 		if (unsubscribeTicks.size() > 0) {

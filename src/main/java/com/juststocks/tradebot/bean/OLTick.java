@@ -15,8 +15,7 @@ public class OLTick extends OHLTick {
 		return tick.getOpenPrice() == tick.getLowPrice();
 	}
 	
-	public int compareTo(OHLTick o) {
-		OLTick otherTick = (OLTick) o;
+	public int compareTo(OHLTick otherTick) {
 		if (tick.getToken() == otherTick.tick.getToken()) {
 			return 0;
 		} else if (getTotalNetLowHighChange() < otherTick.getTotalNetLowHighChange()
