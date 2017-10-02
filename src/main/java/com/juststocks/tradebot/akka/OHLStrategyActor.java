@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.juststocks.tradebot.bean.KiteProperties;
+import com.juststocks.tradebot.bean.OHLTick;
 import com.juststocks.tradebot.bean.OHTick;
 import com.juststocks.tradebot.bean.OLTick;
 import com.juststocks.tradebot.constants.TradebotConstants;
@@ -45,7 +46,9 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 	@Override
 	public Receive createReceive() {
 		return receiveBuilder().match(Tick.class, tick -> {
-			if (!nonOHLTickSet.contains(tick.getToken())
+			OHLTick ohlTick = new OHTick(tick);
+			if (!ohlTick.isOLOH()
+					&& !nonOHLTickSet.contains(tick.getToken())
 					&& !orderedTickMap.containsKey(tick.getToken())) {
 				List<Long> unsubscribeTicks = new ArrayList<>();
 				OLTick olTick = new OLTick(tick);
@@ -112,7 +115,7 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 				LOGGER.info(OL_TICK_MAP_SIZE, olTickMap.size());
 				LOGGER.info(OH_TICK_MAP_SIZE, ohTickMap.size());
 				LOGGER.info(NON_OHL_TICK_SET_SIZE, nonOHLTickSet.size());
-				LOGGER.info(OL_OH_NON_OHL_TICK_SET_SIZE, olTickMap.size() + ohTickMap.size() + nonOHLTickSet.size());
+				LOGGER.info(TOTAL_TICK_SET_SIZE, olTickMap.size() + ohTickMap.size() + nonOHLTickSet.size());
 			}
 		}).build();
 	}

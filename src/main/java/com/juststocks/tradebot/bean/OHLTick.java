@@ -17,6 +17,10 @@ public abstract class OHLTick extends Tick implements Comparable<OHLTick> {
 		this.tick = tick;
 	}
 	
+	public boolean isOLOH() {
+		return tick.getOpenPrice() == tick.getLowPrice() && tick.getOpenPrice() == tick.getHighPrice();
+	}
+	
 	public double getNetLowChange() {
 		return Precision.round((tick.getLastTradedPrice() - tick.getLowPrice()) / tick.getLowPrice(), 6) * 100;
 	}

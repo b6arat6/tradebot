@@ -6,11 +6,11 @@ package com.juststocks.tradebot.bean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -30,7 +30,8 @@ public class KiteProperties implements TradebotConstants {
 	public static Map<Long, OHTick> ohTickMap = new ConcurrentHashMap<>();
 	
 	public static Set<Long> nonOHLTickSet = new HashSet<>();
-	public static Map<Long, String> orderedTickMap = new ConcurrentSkipListMap<>();
+	
+	public static Map<Long, String> orderedTickMap = new LinkedHashMap<>();
 	
 	private String userId;
 	

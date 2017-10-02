@@ -42,10 +42,12 @@ public class ApacheHttpUtil implements TradebotConstants {
 		return null;
 	}
 
+	// TODO Yet to complete
 	public static class RedirectResponseHandler<T> implements ResponseHandler<T> {
 		@Override
 		public T handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
 			if (response.getStatusLine().getStatusCode() == HTTP_STATUS_CODE_REDIRECT) {
+				@SuppressWarnings("unused")
 				String uri = response.getFirstHeader(HTTP_HEADER_LOCATION).getValue();
 			}
 			return null;

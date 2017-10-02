@@ -41,8 +41,8 @@ public interface TradebotConstants {
 													+ SYMBOL_NEW_LINE + "Quantity={}"
 													+ SYMBOL_NEW_LINE + "Price={}"
 													+ SYMBOL_NEW_LINE + "OrderVariety={}"
-													+ SYMBOL_NEW_LINE + "SquareoffValue={}"
-													+ SYMBOL_NEW_LINE + "StoplossValue={}"
+													+ SYMBOL_NEW_LINE + "SquareoffValue={} ({})"
+													+ SYMBOL_NEW_LINE + "StoplossValue={} ({})"
 													+ SYMBOL_NEW_LINE + "TrailingStoploss={}";
 	public static final String SHUTTING_DOWN = "Shutting down...";
 	public static final String SHUTDOWN_COMPLETE = "Shutdown complete!";
@@ -56,8 +56,8 @@ public interface TradebotConstants {
 												+ SYMBOL_NEW_LINE + "Quantity={}"
 												+ SYMBOL_NEW_LINE + "Price={}"
 												+ SYMBOL_NEW_LINE + "OrderVariety={}"
-												+ SYMBOL_NEW_LINE + "SquareoffValue={}"
-												+ SYMBOL_NEW_LINE + "StoplossValue={}"
+												+ SYMBOL_NEW_LINE + "SquareoffValue={}  ({})"
+												+ SYMBOL_NEW_LINE + "StoplossValue={}  ({})"
 												+ SYMBOL_NEW_LINE + "TrailingStoploss={}";
 	public static final String EXCEPTION_KITE = "KiteException! I={}, Code=<CODE>, Error=<ERROR>";
 
@@ -89,16 +89,16 @@ public interface TradebotConstants {
 	public static final String OL_TICK_MAP_SIZE = "OLTickMap, Size={}";
 	public static final String OH_TICK_MAP_SIZE = "OHTickMap, Size={}";
 	public static final String NON_OHL_TICK_SET_SIZE = "NonOHLTickSet, Size={}";
-	public static final String OL_OH_NON_OHL_TICK_SET_SIZE = "OlOhNonOhlTickSetSize, Size={}";
-	public static final String OL_TICK_SET_SIZE = "OLTickMap, Size={}";
-	public static final String OH_TICK_SET_SIZE = "OHTickMap, Size={}";
+	public static final String TOTAL_TICK_SET_SIZE = "TotalTickSet, Size={}";
+	public static final String ORDERED_TICK_MAP_SIZE = "OrderedTickMap, Size={}";
 	
 	public static final String OHL_OL_TICK = "O=L, I={}, LTP={}, L={}, O={}, H={}, NLHC={}, NLC={}, NHC={}, Tb>Ts={}, T={}";
 	public static final String OHL_OH_TICK = "O=H, I={}, LTP={}, L={}, O={}, H={}, NLHC={}, NLC={}, NHC={}, Ts>Tb={}, T={}";
+	public static final String ORDERED_TICK = "Ordered, I={}";
 	
 	public static final String ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
 	public static final String ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING = "LogTradeableTickData";
 	// ss mm hh * * dd
-	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "00 57 01 * * 0-6";
+	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "00 04 02 * * 0-6";
 	
 }
