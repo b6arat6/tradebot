@@ -49,8 +49,8 @@ public interface TradebotConstants {
 	
 	public static final String REPLACE_HOLDER_CODE = "<CODE>";
 	public static final String REPLACE_HOLDER_ERROR = "<ERROR>";
-	public static final String EXCEPTION_AUTH_KITE = "Authentication failed! Code=<CODE>, Error=<ERROR>";
-	public static final String EXCEPTION_ORDER_KITE = " Order generation failed! I={}, Code=<CODE>, Error=<ERROR>";
+	public static final String EXCEPTION_AUTH_KITE = "Authentication exception! Code=<CODE>, Error=<ERROR>";
+	public static final String EXCEPTION_ORDER_KITE = " Order exception! I={}, Code=<CODE>, Error=<ERROR>";
 	public static final String ORDER_GENERATION_FAILED = "Order generation failed for I={},"
 												+ SYMBOL_NEW_LINE + "TransactionType={}"
 												+ SYMBOL_NEW_LINE + "Quantity={}"
@@ -99,6 +99,6 @@ public interface TradebotConstants {
 	public static final String ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
 	public static final String ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING = "LogTradeableTickData";
 	// ss mm hh * * dd
-	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "00 04 02 * * 0-6";
+	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "00 26 09 * * 0-6";
 	
 }

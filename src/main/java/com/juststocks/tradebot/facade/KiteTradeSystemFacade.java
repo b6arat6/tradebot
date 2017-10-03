@@ -356,14 +356,14 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()).toLowerCase())
 							.get(0)
 							.getPrice();
-					price = price + 0.05;
+					price = Precision.round(price + 0.05, 2);
 				}
 				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()) {
 					price = tick.getMarketDepth()
 							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()).toLowerCase())
 							.get(0)
 							.getPrice();
-					price = price - 0.05;
+					price = Precision.round(price - 0.05, 2);
 				}
 			}
 			if (properties.getOhlStrategyInstrumentType().equals(OHLStrategyEnum.INSTRUMENT_TYPE_EQ.getValue())) {
@@ -379,8 +379,8 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 				tradeQuantity = properties.getTradingInstrumentMap().get(tick.getToken()).getLot_size();
 			}
 			if (properties.getOhlTradeOrderVarietyValueIndex() == ParameterData.ValueIndexEnum.ORDER_VARIETY_BO.getIndex()) {
-				squareoffValue = Precision.round(price * properties.getOhlTradeBOTargetPercent() / 100, 0) - 0.05;
-				squareoffAbsValue = price + (ohlSign * squareoffValue);
+				squareoffValue = Precision.round(price * properties.getOhlTradeBOTargetPercent() / 100, 1) - 0.05;
+				squareoffAbsValue = Math.abs(price + (ohlSign * squareoffValue));
 				
 				stoplossAbsValue = Precision.round(tick.getOpenPrice() - (ohlSign * (0.05 + properties.getOhlTradeBOExtraStoploss())), 2);
 				stoplossValue = Precision.round(Math.abs(price - stoplossAbsValue), 2);
@@ -425,7 +425,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 							, stoplossValue, stoplossAbsValue
 							, trailingStoploss);
 				} else {
-					ORDER_LOGGER.info(ORDER_GENERATION_FAILED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
+					ORDER_LOGGER.error(ORDER_GENERATION_FAILED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
 							, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
 							, tradeQuantity
 							, price
@@ -441,7 +441,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 				ORDER_LOGGER.error(EXCEPTION_ORDER_KITE.replace(REPLACE_HOLDER_CODE, String.valueOf(e.code))
 						.replace(REPLACE_HOLDER_ERROR, e.message)
 						, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol());
-				ORDER_LOGGER.info(ORDER_GENERATION_FAILED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
+				ORDER_LOGGER.error(ORDER_GENERATION_FAILED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
 						, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
 						, tradeQuantity
 						, price
