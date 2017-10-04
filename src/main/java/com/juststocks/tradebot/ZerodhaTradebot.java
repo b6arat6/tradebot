@@ -27,7 +27,7 @@ public class ZerodhaTradebot implements Tradebot {
 	public KiteProperties properties;
 	
 	@Autowired
-	private KiteTradeSystemFacade tradeSystemFacade;
+	public KiteTradeSystemFacade tradeSystemFacade;
 	
 	@Override
 	public boolean run(String[] args) {

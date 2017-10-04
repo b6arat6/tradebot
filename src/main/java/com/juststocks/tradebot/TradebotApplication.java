@@ -1,5 +1,9 @@
 package com.juststocks.tradebot;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,9 @@ import akka.actor.Cancellable;
 @SpringBootApplication
 public class TradebotApplication implements TradebotConstants, ExitCodeGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
+	
+	private static boolean shutdown = false;
+	private final static BufferedReader BUFFERED_READER = new BufferedReader(new InputStreamReader(System.in));
 
 	private static ConfigurableApplicationContext context;
 	
@@ -40,13 +47,19 @@ public class TradebotApplication implements TradebotConstants, ExitCodeGenerator
 		@Override
 		public void run() {
 			LOGGER.info(SHUTTING_DOWN);
+			try {
+				BUFFERED_READER.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			tradeableTickDataLoggingActorCancellable.cancel();
 			actorSystem.terminate();
 			LOGGER.info(SHUTDOWN_COMPLETE);
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		LOGGER.info(METHOD_ENTRY);
 		
 		context = SpringApplication.run(TradebotApplication.class);
@@ -55,9 +68,31 @@ public class TradebotApplication implements TradebotConstants, ExitCodeGenerator
 		
 		Runtime.getRuntime().addShutdownHook(tradebotApplication.new ShutdownHook());
 		
-		if (!tradebotApplication.zerodhaTradebot.run(args)) {
-			SpringApplication.exit(context, tradebotApplication);
-			System.exit(-1);
+		Thread zerodhaTradebotThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if (!tradebotApplication.zerodhaTradebot.run(args)) {
+					SpringApplication.exit(context, tradebotApplication);
+					System.exit(-1);
+				}
+			}
+		});
+		zerodhaTradebotThread.start();
+		
+		System.err.println(ENTER_COMMAND);
+		while (!shutdown) {
+			switch (Integer.valueOf(BUFFERED_READER.readLine())) {
+			case COMMAND_ORDER_SHUTDOWN:
+				shutdown = true;
+				zerodhaTradebotThread.interrupt();
+				System.exit(-1);
+				break;
+			case COMMAND_ORDER_OHL:
+				tradebotApplication.zerodhaTradebot.tradeSystemFacade.triggerOHLStrategyOrders();
+				break;
+			default:
+				break;
+			}
 		}
 		
 		LOGGER.info(METHOD_EXIT);

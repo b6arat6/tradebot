@@ -12,6 +12,8 @@ public interface TradebotConstants {
 	public static final String SYMBOL_QUESTION = "?";
 	public static final String SYMBOL_AMPERSAND = "&";
 	public static final String SYMBOL_HYPHEN = "-";
+	public static final String SYMBOL_PLUS = "+";
+	public static final String SYMBOL_MINUS = "-";
 	
 	public static final String LOGGER_MAIN = "mainLogger";
 	public static final String LOGGER_STRATEGY = "strategyLogger";
@@ -37,11 +39,12 @@ public interface TradebotConstants {
 	public static final String INSTRUMENT_UNSUBSCRIBING= "UnsubscribingInstrument={}, T={}";
 	public static final String TRADE_TYPE_OHL_STRATEGY_TRIGGERED = "Trade (OHLStrategy) triggered";
 	public static final String ORDER_GENERATED = "Order generated for I={}"
-													+ SYMBOL_NEW_LINE + "TransactionType={}"
+													+ SYMBOL_NEW_LINE + "TransactionType={}_{}({})"
 													+ SYMBOL_NEW_LINE + "Quantity={}"
 													+ SYMBOL_NEW_LINE + "Price={}"
 													+ SYMBOL_NEW_LINE + "OrderVariety={}"
 													+ SYMBOL_NEW_LINE + "SquareoffValue={} ({})"
+													+ SYMBOL_NEW_LINE + "OpenPrice={}"
 													+ SYMBOL_NEW_LINE + "StoplossValue={} ({})"
 													+ SYMBOL_NEW_LINE + "TrailingStoploss={}";
 	public static final String SHUTTING_DOWN = "Shutting down...";
@@ -95,10 +98,14 @@ public interface TradebotConstants {
 	public static final String OHL_OL_TICK = "O=L, I={}, LTP={}, L={}, O={}, H={}, NLHC={}, NLC={}, NHC={}, Tb>Ts={}, T={}";
 	public static final String OHL_OH_TICK = "O=H, I={}, LTP={}, L={}, O={}, H={}, NLHC={}, NLC={}, NHC={}, Ts>Tb={}, T={}";
 	public static final String ORDERED_TICK = "Ordered, I={}";
-	
+
+	public static final String ENTER_COMMAND = "Anticipating for Command (0-Shutdown, 1-OrderOhl) anytime!";
+	public static final int COMMAND_ORDER_SHUTDOWN = 0;
+	public static final int COMMAND_ORDER_OHL = 1;
+			
 	public static final String ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
 	public static final String ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING = "LogTradeableTickData";
 	// ss mm hh * * dd
-	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "00 26 09 * * 0-6";
+	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "45 20 09 * * 0-6";
 	
 }

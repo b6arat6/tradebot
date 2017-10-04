@@ -7,6 +7,7 @@ import static com.juststocks.tradebot.bean.KiteProperties.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -258,13 +258,20 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		MAIN_LOGGER.debug(METHOD_ENTRY);
 		if (ticks.size() > 0) {
 			MAIN_LOGGER.info(KITE_ON_TICK_SIZE, ticks.size());
-			tickDispenserActorRef.tell(new TickDispenserActor.MyArrayList(ticks), ActorRef.noSender());
+			if (!((Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 9 
+					&& Calendar.getInstance().get(Calendar.MINUTE) >= 00
+					&& Calendar.getInstance().get(Calendar.SECOND) >= 00)
+					&& (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 9 
+							&& Calendar.getInstance().get(Calendar.MINUTE) >= 15
+							&& Calendar.getInstance().get(Calendar.SECOND) >= 05))) {
+				tickDispenserActorRef.tell(new TickDispenserActor.MyArrayList(ticks), ActorRef.noSender());
+			}
 		}
 		MAIN_LOGGER.debug(METHOD_EXIT);
 	}
 
 	@Override
-	@Scheduled(cron = CRON_ENTRY_OHL_STRATEGY_ORDERS)
+//	@Scheduled(cron = CRON_ENTRY_OHL_STRATEGY_ORDERS)
 	public void triggerOHLStrategyOrders() {
 		orderActorRef.tell(ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY, ActorRef.noSender());
 	}
@@ -319,6 +326,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	@Override
 	public <E> boolean placeOHLOrder(Collection<E> ohlTickCollection, final int tradeCount, final ParameterData.ValueIndexEnum transactionType, int ohlSign) {
 		Tick tick;
+		String orderSign = null;
 		int tradedCount = 0;
 		IndicesQuote indicesQuote;
 		int tradeQuantity = 0;
@@ -336,8 +344,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 			try {
 				Thread.sleep(350);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ORDER_LOGGER.debug(e.getMessage());
 			}
 			tick.setLastTradedPrice(indicesQuote.lastPrice);
 			if (!(tick.getLastTradedPrice() >= properties.getOhlTradeMinInstrumentPrice()
@@ -350,6 +357,24 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 					|| orderedTickMap.containsKey(tick.getToken())) {
 				continue;
 			}
+			if (tick.getLastTradedPrice() <= tick.getLowPrice()) {
+				if (olTickMap.remove(tick.getToken()) != null) {
+					ORDER_LOGGER.warn(STRATEGY_OHL_OL_REMOVED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
+							tick.getLastTradedPrice(), 
+							tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
+							tick.getToken());
+				}
+				continue;
+			}
+			if (tick.getLastTradedPrice() >= tick.getHighPrice()) {
+				if (ohTickMap.remove(tick.getToken()) != null) {
+					ORDER_LOGGER.warn(STRATEGY_OHL_OH_REMOVED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
+							tick.getLastTradedPrice(), 
+							tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
+							tick.getToken());
+				}
+				continue;
+			}
 			if (properties.getOhlTradeOrderTypeValueIndex() == ParameterData.ValueIndexEnum.ORDER_TYPE_LIMIT.getIndex()) {
 				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()) {
 					price = tick.getMarketDepth()
@@ -357,6 +382,10 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 							.get(0)
 							.getPrice();
 					price = Precision.round(price + 0.05, 2);
+					if (price <= tick.getOpenPrice()) {
+						continue;
+					}
+					orderSign = SYMBOL_PLUS;
 				}
 				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()) {
 					price = tick.getMarketDepth()
@@ -364,6 +393,10 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 							.get(0)
 							.getPrice();
 					price = Precision.round(price - 0.05, 2);
+					if (price >= tick.getOpenPrice()) {
+						continue;
+					}
+					orderSign = SYMBOL_MINUS;
 				}
 			}
 			if (properties.getOhlStrategyInstrumentType().equals(OHLStrategyEnum.INSTRUMENT_TYPE_EQ.getValue())) {
@@ -379,8 +412,8 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 				tradeQuantity = properties.getTradingInstrumentMap().get(tick.getToken()).getLot_size();
 			}
 			if (properties.getOhlTradeOrderVarietyValueIndex() == ParameterData.ValueIndexEnum.ORDER_VARIETY_BO.getIndex()) {
-				squareoffValue = Precision.round(price * properties.getOhlTradeBOTargetPercent() / 100, 1) - 0.05;
-				squareoffAbsValue = Math.abs(price + (ohlSign * squareoffValue));
+				squareoffValue = Precision.round(Precision.round(price * properties.getOhlTradeBOTargetPercent() / 100, 1) - 0.05, 2);
+				squareoffAbsValue = Precision.round(Math.abs(price + (ohlSign * squareoffValue)), 2);
 				
 				stoplossAbsValue = Precision.round(tick.getOpenPrice() - (ohlSign * (0.05 + properties.getOhlTradeBOExtraStoploss())), 2);
 				stoplossValue = Precision.round(Math.abs(price - stoplossAbsValue), 2);
@@ -418,10 +451,13 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 					unsubscribeTicks.add(tick.getToken());
 					ORDER_LOGGER.info(ORDER_GENERATED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol().toUpperCase()
 							, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
+							, tradedCount
+							, orderSign
 							, tradeQuantity
 							, price
 							, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex())
 							, squareoffValue, squareoffAbsValue
+							, tick.getOpenPrice()
 							, stoplossValue, stoplossAbsValue
 							, trailingStoploss);
 				} else {
