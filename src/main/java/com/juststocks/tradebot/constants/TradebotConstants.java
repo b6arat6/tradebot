@@ -44,7 +44,9 @@ public interface TradebotConstants {
 													+ SYMBOL_NEW_LINE + "Price={}"
 													+ SYMBOL_NEW_LINE + "OrderVariety={}"
 													+ SYMBOL_NEW_LINE + "SquareoffValue={} ({})"
+													+ SYMBOL_NEW_LINE + "LowPrice={}"
 													+ SYMBOL_NEW_LINE + "OpenPrice={}"
+													+ SYMBOL_NEW_LINE + "HighPrice={}"
 													+ SYMBOL_NEW_LINE + "StoplossValue={} ({})"
 													+ SYMBOL_NEW_LINE + "TrailingStoploss={}";
 	public static final String SHUTTING_DOWN = "Shutting down...";
@@ -70,14 +72,14 @@ public interface TradebotConstants {
 	public static final String BEAN_AKKA_ACTOR_SYSTEM = "TradebotAkkaActorSystem";
 	public static final String BEAN_AKKA_OHL_STRATEGY_ACTOR_REF = "OHLStrategyActorRef";
 	public static final String BEAN_AKKA_TICK_DISPENSER_ACTOR_REF = "TickDispenserActorRef";
-	public static final String BEAN_AKKA_ORDER_GENERATOR_ACTOR_REF = "OrderGeneratorActorRef";
+	public static final String BEAN_AKKA_TRADE_GENERATOR_ACTOR_REF = "TradeGeneratorActorRef";
 	public static final String BEAN_AKKA_TRADEABLE_TICK_DATA_LOGGING_ACTOR_CANCELLABLE = "TradeableTickDataLoggingActorCancellable";
 	public static final String BEAN_AKKA_ORDER_MONITOR_ACTOR_REF = "OrderMonitorActorRef";
 	
 	public static final int HTTP_STATUS_CODE_REDIRECT = 302;
 	public static final String HTTP_HEADER_LOCATION = "Location";
 	
-	public static final String KITE_CONNECT_AT_PT = SYMBOL_NEW_LINE + "AT={}" + SYMBOL_NEW_LINE + "PT={}";
+	public static final String KITE_CONNECT_AT_PT = SYMBOL_NEW_LINE + "A={}" + SYMBOL_NEW_LINE + "P={}";
 	public static final String KITE_CONNECT_QUERY_PARAM_API_KEY = "api_key=";
 	public static final String KITE_CONNECT_QUERY_PARAM_ACCESS_TOKEN = "access_token=";
 	
@@ -89,6 +91,7 @@ public interface TradebotConstants {
 	public static final String STRATEGY_OHL_OH_UPDATED = "Updated OHMap, I={}, LTP={}, L={}, O={}, H={}, T={}";
 	public static final String STRATEGY_OHL_OL_UPDATE_FAILED = "Updating OLMap failed, I={}, LTP={}, L={}, O={}, H={}, T={}";
 	public static final String STRATEGY_OHL_OH_UPDATE_FAILED = "Updating OHMap failed, I={}, LTP={}, L={}, O={}, H={}, T={}";
+	
 	public static final String OL_TICK_MAP_SIZE = "OLTickMap, Size={}";
 	public static final String OH_TICK_MAP_SIZE = "OHTickMap, Size={}";
 	public static final String NON_OHL_TICK_SET_SIZE = "NonOHLTickSet, Size={}";
@@ -99,13 +102,13 @@ public interface TradebotConstants {
 	public static final String OHL_OH_TICK = "O=H, I={}, LTP={}, L={}, O={}, H={}, NLHC={}, NLC={}, NHC={}, Ts>Tb={}, T={}";
 	public static final String ORDERED_TICK = "Ordered, I={}";
 
-	public static final String ENTER_COMMAND = "Anticipating for Command (0-Shutdown, 1-OrderOhl) anytime!";
-	public static final int COMMAND_ORDER_SHUTDOWN = 0;
-	public static final int COMMAND_ORDER_OHL = 1;
+	public static final String ENTER_COMMAND = "Anticipating for Command (0-Shutdown, 1-TradeOHL) anytime!";
+	public static final int COMMAND_SHUTDOWN = 0;
+	public static final int COMMAND_TRADE_OHL = 1;
 			
-	public static final String ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY = "OHLStrategyOrder";
-	public static final String ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING = "LogTradeableTickData";
+	public static final String ACTOR_TRADE_GENERATOR_MSG_TYPE_TRADE_OHL = "TradeOHL";
+	public static final String ACTOR_TRADEABLE_TICK_DATA_LOGGING_ACTOR_MSG_TYPE_LOG_TICK_DATA = "LogTickData";
 	// ss mm hh * * dd
-	public static final String CRON_ENTRY_OHL_STRATEGY_ORDERS = "45 20 09 * * 0-6";
+	public static final String CRON_ENTRY_OHL_TRADE_TRIGGER = "00 15 00 * * 0-6";
 	
 }

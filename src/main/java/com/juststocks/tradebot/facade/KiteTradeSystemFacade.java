@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -74,7 +75,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 	private ActorRef tickDispenserActorRef;
 
 	@Autowired
-	@Qualifier(BEAN_AKKA_ORDER_GENERATOR_ACTOR_REF)
+	@Qualifier(BEAN_AKKA_TRADE_GENERATOR_ACTOR_REF)
 	private ActorRef orderActorRef;
 
 	public KiteConnect getKiteConnect() {
@@ -258,22 +259,25 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		MAIN_LOGGER.debug(METHOD_ENTRY);
 		if (ticks.size() > 0) {
 			MAIN_LOGGER.info(KITE_ON_TICK_SIZE, ticks.size());
-			if (!((Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 9 
-					&& Calendar.getInstance().get(Calendar.MINUTE) >= 00
-					&& Calendar.getInstance().get(Calendar.SECOND) >= 00)
-					&& (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 9 
-							&& Calendar.getInstance().get(Calendar.MINUTE) >= 15
-							&& Calendar.getInstance().get(Calendar.SECOND) >= 05))) {
+			Calendar calendar = Calendar.getInstance();
+			if (!(calendar.get(Calendar.HOUR_OF_DAY) == 9
+					&& calendar.get(Calendar.MINUTE) > 0
+					&& calendar.get(Calendar.MINUTE) < 15)) {
 				tickDispenserActorRef.tell(new TickDispenserActor.MyArrayList(ticks), ActorRef.noSender());
 			}
 		}
 		MAIN_LOGGER.debug(METHOD_EXIT);
 	}
+	
+	@Override
+	@Scheduled(cron = CRON_ENTRY_OHL_TRADE_TRIGGER)
+	public void scheduledOHLTradesTrigger() {
+		orderActorRef.tell(ACTOR_TRADE_GENERATOR_MSG_TYPE_TRADE_OHL, ActorRef.noSender());
+	}
 
 	@Override
-//	@Scheduled(cron = CRON_ENTRY_OHL_STRATEGY_ORDERS)
-	public void triggerOHLStrategyOrders() {
-		orderActorRef.tell(ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY, ActorRef.noSender());
+	public void triggerTrades(final String tradeType) {
+		orderActorRef.tell(tradeType, ActorRef.noSender());
 	}
 
 	@Override
@@ -342,7 +346,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 			tick = ohlTick.tick;
 			indicesQuote = this.<IndicesQuote> getQuoteIndices(tick.getToken());
 			try {
-				Thread.sleep(350);
+				Thread.sleep(450);
 			} catch (InterruptedException e) {
 				ORDER_LOGGER.debug(e.getMessage());
 			}
@@ -359,6 +363,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 			}
 			if (tick.getLastTradedPrice() <= tick.getLowPrice()) {
 				if (olTickMap.remove(tick.getToken()) != null) {
+					nonOHLTickSet.add(tick.getToken());
 					ORDER_LOGGER.warn(STRATEGY_OHL_OL_REMOVED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
 							tick.getLastTradedPrice(), 
 							tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
@@ -368,6 +373,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 			}
 			if (tick.getLastTradedPrice() >= tick.getHighPrice()) {
 				if (ohTickMap.remove(tick.getToken()) != null) {
+					nonOHLTickSet.add(tick.getToken());
 					ORDER_LOGGER.warn(STRATEGY_OHL_OH_REMOVED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
 							tick.getLastTradedPrice(), 
 							tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
@@ -438,10 +444,9 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 								, trailingStoploss)
 				, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()));
 				try {
-					Thread.sleep(350);
+					Thread.sleep(450);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					ORDER_LOGGER.debug(e.getMessage());
 				}
 				if (order != null) {
 					tradedCount++;
@@ -457,7 +462,9 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 							, price
 							, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex())
 							, squareoffValue, squareoffAbsValue
+							, tick.getLowPrice()
 							, tick.getOpenPrice()
+							, tick.getHighPrice()
 							, stoplossValue, stoplossAbsValue
 							, trailingStoploss);
 				} else {

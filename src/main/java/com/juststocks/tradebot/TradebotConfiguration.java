@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.juststocks.tradebot.akka.OHLStrategyActor;
-import com.juststocks.tradebot.akka.OrderGeneratorActor;
+import com.juststocks.tradebot.akka.TradeGeneratorActor;
 import com.juststocks.tradebot.akka.TickDispenserActor;
 import com.juststocks.tradebot.akka.TradeableTickDataLoggingActor;
 import com.juststocks.tradebot.bean.KiteProperties;
@@ -65,9 +65,9 @@ public class TradebotConfiguration implements TradebotConstants {
 				.withRouter(new SmallestMailboxPool(kiteProperties.getTickDisperserActorRoutees())));
 	}
 	
-	@Bean(name=BEAN_AKKA_ORDER_GENERATOR_ACTOR_REF)
-	public ActorRef orderGeneratorActor() {
-		return actorSystem.actorOf(OrderGeneratorActor.props(kiteProperties, kiteTradeSystemFacade)
+	@Bean(name=BEAN_AKKA_TRADE_GENERATOR_ACTOR_REF)
+	public ActorRef tradeGeneratorActor() {
+		return actorSystem.actorOf(TradeGeneratorActor.props(kiteProperties, kiteTradeSystemFacade)
 				.withRouter(new SmallestMailboxPool(kiteProperties.getOrderActorRoutees())));
 	}
 	
@@ -77,7 +77,7 @@ public class TradebotConfiguration implements TradebotConstants {
 				.schedule(Duration.create(kiteProperties.getTradeableTickDataLoggingInitDelay(), TimeUnit.MILLISECONDS)
 						, Duration.create(kiteProperties.getTradeableTickDataLoggingInterval(), TimeUnit.MILLISECONDS)
 						, actorSystem.actorOf(TradeableTickDataLoggingActor.props(kiteProperties))
-						, ACTOR_TRADEABLE_MSG_TICK_DATA_LOGGING
+						, ACTOR_TRADEABLE_TICK_DATA_LOGGING_ACTOR_MSG_TYPE_LOG_TICK_DATA
 						, actorSystem.dispatcher()
 						, ActorRef.noSender());
 	}

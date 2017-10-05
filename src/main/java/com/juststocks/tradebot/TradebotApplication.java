@@ -82,13 +82,13 @@ public class TradebotApplication implements TradebotConstants, ExitCodeGenerator
 		System.err.println(ENTER_COMMAND);
 		while (!shutdown) {
 			switch (Integer.valueOf(BUFFERED_READER.readLine())) {
-			case COMMAND_ORDER_SHUTDOWN:
+			case COMMAND_SHUTDOWN:
 				shutdown = true;
 				zerodhaTradebotThread.interrupt();
 				System.exit(-1);
 				break;
-			case COMMAND_ORDER_OHL:
-				tradebotApplication.zerodhaTradebot.tradeSystemFacade.triggerOHLStrategyOrders();
+			case COMMAND_TRADE_OHL:
+				tradebotApplication.zerodhaTradebot.tradeSystemFacade.triggerTrades(ACTOR_TRADE_GENERATOR_MSG_TYPE_TRADE_OHL);
 				break;
 			default:
 				break;

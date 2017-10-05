@@ -31,8 +31,10 @@ public interface TradeSystemFacade extends TradebotConstants {
 	
 	boolean initWebSocket();
 	
-	public void triggerOHLStrategyOrders();
-
+	public void triggerTrades(final String tradeType);
+	
+	public void scheduledOHLTradesTrigger();
+	
 	boolean subscribeInstruments(ArrayList<Long> tokens);
 	
 	boolean unsubscribeInstruments(ArrayList<Long> tokens);

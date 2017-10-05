@@ -115,7 +115,8 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 				LOGGER.info(OL_TICK_MAP_SIZE, olTickMap.size());
 				LOGGER.info(OH_TICK_MAP_SIZE, ohTickMap.size());
 				LOGGER.info(NON_OHL_TICK_SET_SIZE, nonOHLTickSet.size());
-				LOGGER.info(TOTAL_TICK_SET_SIZE, olTickMap.size() + ohTickMap.size() + nonOHLTickSet.size());
+				LOGGER.info(ORDERED_TICK_MAP_SIZE, orderedTickMap.size());
+				LOGGER.info(TOTAL_TICK_SET_SIZE, olTickMap.size() + ohTickMap.size() + nonOHLTickSet.size() + orderedTickMap.size());
 			}
 		}).build();
 	}

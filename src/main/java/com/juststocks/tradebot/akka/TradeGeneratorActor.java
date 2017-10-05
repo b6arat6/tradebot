@@ -23,27 +23,27 @@ import akka.actor.Props;
  * @author bharath_kandasamy
  *
  */
-public class OrderGeneratorActor extends AbstractActor implements TradebotConstants {
+public class TradeGeneratorActor extends AbstractActor implements TradebotConstants {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_ORDER);
 	
 	public static Props props(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
-		return Props.create(OrderGeneratorActor.class, () -> new OrderGeneratorActor(kiteProperties, kiteTradeSystemFacade));
+		return Props.create(TradeGeneratorActor.class, () -> new TradeGeneratorActor(kiteProperties, kiteTradeSystemFacade));
 	}
 	
 	private KiteProperties kiteProperties;
 	
 	private KiteTradeSystemFacade kiteTradeSystemFacade;
 	
-	public OrderGeneratorActor(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
+	public TradeGeneratorActor(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
 		this.kiteProperties = kiteProperties;
 		this.kiteTradeSystemFacade = kiteTradeSystemFacade;
 	}
 
 	@Override
 	public Receive createReceive() {
-		return receiveBuilder().match(String.class, orderType -> {
-			if (orderType.equals(ACTOR_ORDER_MSG_TYPE_OHL_STRATEGY)) {
+		return receiveBuilder().match(String.class, tradeType -> {
+			if (tradeType.equals(ACTOR_TRADE_GENERATOR_MSG_TYPE_TRADE_OHL)) {
 				LOGGER.info(TRADE_TYPE_OHL_STRATEGY_TRIGGERED);
 				if (kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OHL.getValue())
 						|| kiteProperties.getOhlStrategyMode() == Integer.valueOf(OHLStrategyEnum.MODE_OL.getValue())) {
