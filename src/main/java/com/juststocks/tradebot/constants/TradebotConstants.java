@@ -38,16 +38,17 @@ public interface TradebotConstants {
 	public static final String KITE_ON_TICK_SIZE = "OnTickSize={}";
 	public static final String INSTRUMENT_UNSUBSCRIBING= "UnsubscribingInstrument={}, T={}";
 	public static final String TRADE_TYPE_OHL_STRATEGY_TRIGGERED = "Trade (OHLStrategy) triggered";
-	public static final String ORDER_GENERATED = "Order generated for I={}"
+	public static final String ORDER_GENERATED = "Order generated for "
+													+ SYMBOL_NEW_LINE + "I={}"
 													+ SYMBOL_NEW_LINE + "TransactionType={}_{}({})"
 													+ SYMBOL_NEW_LINE + "Quantity={}"
 													+ SYMBOL_NEW_LINE + "Price={}"
 													+ SYMBOL_NEW_LINE + "OrderVariety={}"
-													+ SYMBOL_NEW_LINE + "SquareoffValue={} ({})"
 													+ SYMBOL_NEW_LINE + "LowPrice={}"
-													+ SYMBOL_NEW_LINE + "OpenPrice={}"
 													+ SYMBOL_NEW_LINE + "HighPrice={}"
-													+ SYMBOL_NEW_LINE + "StoplossValue={} ({})"
+													+ SYMBOL_NEW_LINE + "OpenPrice={}"
+													+ SYMBOL_NEW_LINE + "Stoploss={} ({})"
+													+ SYMBOL_NEW_LINE + "Target={} ({})"
 													+ SYMBOL_NEW_LINE + "TrailingStoploss={}";
 	public static final String SHUTTING_DOWN = "Shutting down...";
 	public static final String SHUTDOWN_COMPLETE = "Shutdown complete!";
@@ -56,13 +57,14 @@ public interface TradebotConstants {
 	public static final String REPLACE_HOLDER_ERROR = "<ERROR>";
 	public static final String EXCEPTION_AUTH_KITE = "Authentication exception! Code=<CODE>, Error=<ERROR>";
 	public static final String EXCEPTION_ORDER_KITE = " Order exception! I={}, Code=<CODE>, Error=<ERROR>";
-	public static final String ORDER_GENERATION_FAILED = "Order generation failed for I={},"
+	public static final String ORDER_GENERATION_FAILED = "Order generation failed for"
+												+ SYMBOL_NEW_LINE + "I={}"
 												+ SYMBOL_NEW_LINE + "TransactionType={}"
 												+ SYMBOL_NEW_LINE + "Quantity={}"
 												+ SYMBOL_NEW_LINE + "Price={}"
 												+ SYMBOL_NEW_LINE + "OrderVariety={}"
-												+ SYMBOL_NEW_LINE + "SquareoffValue={}  ({})"
-												+ SYMBOL_NEW_LINE + "StoplossValue={}  ({})"
+												+ SYMBOL_NEW_LINE + "Stoploss={}  ({})"
+												+ SYMBOL_NEW_LINE + "Target={}  ({})"
 												+ SYMBOL_NEW_LINE + "TrailingStoploss={}";
 	public static final String EXCEPTION_KITE = "KiteException! I={}, Code=<CODE>, Error=<ERROR>";
 

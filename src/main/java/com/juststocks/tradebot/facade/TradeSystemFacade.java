@@ -29,6 +29,8 @@ public interface TradeSystemFacade extends TradebotConstants {
 	
 	<T> T getQuoteIndices(Long token);
 	
+	<T> T getQuote(Long token);
+	
 	boolean initWebSocket();
 	
 	public void triggerTrades(final String tradeType);

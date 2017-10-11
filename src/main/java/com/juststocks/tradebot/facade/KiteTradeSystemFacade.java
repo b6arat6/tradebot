@@ -40,6 +40,7 @@ import com.rainmatter.kitehttp.exceptions.KiteException;
 import com.rainmatter.models.IndicesQuote;
 import com.rainmatter.models.Instrument;
 import com.rainmatter.models.Order;
+import com.rainmatter.models.Quote;
 import com.rainmatter.models.Tick;
 import com.rainmatter.models.UserModel;
 import com.rainmatter.ticker.KiteTicker;
@@ -186,6 +187,25 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		}
 		return (T) indicesQuote;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getQuote(Long token) {
+		Quote quote = null;
+		try {
+			quote = kiteConnect.getQuote(
+					properties.getParameterData().getExchange().get(properties.getOhlStrategyExchangeValueIndex())
+					, properties.getTradingInstrumentMap().get(token).getTradingsymbol());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KiteException e) {
+			ORDER_LOGGER.error(EXCEPTION_KITE.replace(REPLACE_HOLDER_CODE, String.valueOf(e.code))
+					.replace(REPLACE_HOLDER_ERROR, e.message)
+					, properties.getTradingInstrumentMap().get(token).getTradingsymbol());
+		}
+		return (T) quote;
+	}
 
 	@Override
 	public boolean initWebSocket() {
@@ -224,9 +244,7 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		MAIN_LOGGER.info(METHOD_ENTRY);
 		boolean subscribed = false;
 		try {
-			kiteTicker.setMode(tokens, KiteTicker.modeFull);
 			kiteTicker.subscribe(tokens);
-			kiteTicker.setMode(tokens, KiteTicker.modeFull);
 			subscribed = true;
 			MAIN_LOGGER.debug(INSTRUMENTS_SUBSCRIBED, tokens.size(), tokens.toString());
 		} catch (IOException e) {
@@ -332,25 +350,26 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 		Tick tick;
 		String orderSign = null;
 		int tradedCount = 0;
-		IndicesQuote indicesQuote;
+		Quote quote;
 		int tradeQuantity = 0;
 		double price = -1;
-		double squareoffValue = -1;
-		double stoplossValue = -1;
-		double trailingStoploss = -1;
-		double squareoffAbsValue = -1;
-		double stoplossAbsValue = -1;
+		double target = -1;
+		double stoploss = -1;
+		double trailingStopLoss = -1;
+		double absoluteTarget = -1;
+		double absoluteStopLoss = -1;
 		Order order = null;
 		List<Long> unsubscribeTicks = new ArrayList<>();
 		for (OHLTick ohlTick : (Collection<OHLTick>) ohlTickCollection) {
 			tick = ohlTick.tick;
-			indicesQuote = this.<IndicesQuote> getQuoteIndices(tick.getToken());
+			quote = this.<Quote> getQuote(tick.getToken());
 			try {
 				Thread.sleep(450);
 			} catch (InterruptedException e) {
 				ORDER_LOGGER.debug(e.getMessage());
 			}
-			tick.setLastTradedPrice(indicesQuote.lastPrice);
+			tick.setLastTradedPrice(quote.lastPrice);
+			tick.setMarketDepth(tick.getMarketDepth());
 			if (!(tick.getLastTradedPrice() >= properties.getOhlTradeMinInstrumentPrice()
 					&& tick.getLastTradedPrice() <= properties.getOhlTradeMaxInstrumentPrice()
 					&& ohlTick.getNetLowChange() <= properties.getOhlTradeableNLC()
@@ -418,13 +437,13 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 				tradeQuantity = properties.getTradingInstrumentMap().get(tick.getToken()).getLot_size();
 			}
 			if (properties.getOhlTradeOrderVarietyValueIndex() == ParameterData.ValueIndexEnum.ORDER_VARIETY_BO.getIndex()) {
-				squareoffValue = Precision.round(Precision.round(price * properties.getOhlTradeBOTargetPercent() / 100, 1) - 0.05, 2);
-				squareoffAbsValue = Precision.round(Math.abs(price + (ohlSign * squareoffValue)), 2);
+				target = Precision.round(Precision.round(price * properties.getOhlTradeBOTargetPercent() / 100, 1) - 0.05, 2);
+				absoluteTarget = Precision.round(Math.abs(price + (ohlSign * target)), 2);
 				
-				stoplossAbsValue = Precision.round(tick.getOpenPrice() - (ohlSign * (0.05 + properties.getOhlTradeBOExtraStoploss())), 2);
-				stoplossValue = Precision.round(Math.abs(price - stoplossAbsValue), 2);
+				absoluteStopLoss = Precision.round(tick.getOpenPrice() - (ohlSign * (0.05 + properties.getOhlTradeBOExtraStoploss())), 2);
+				stoploss = Precision.round(Math.abs(price - absoluteStopLoss), 2);
 				
-				trailingStoploss = properties.getOhlTradeBOTrailingStoploss();
+				trailingStopLoss = properties.getOhlTradeBOTrailingStoploss();
 			}
 			try {
 				order = kiteConnect.placeOrder(
@@ -439,9 +458,9 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 								, properties.getParameterData().getValidity().get(ParameterData.ValueIndexEnum.VALIDITY_IOC.getIndex())
 								, -1
 								, -1
-								, squareoffValue
-								, stoplossValue
-								, trailingStoploss)
+								, target
+								, stoploss
+								, trailingStopLoss)
 				, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()));
 				try {
 					Thread.sleep(450);
@@ -461,21 +480,21 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 							, tradeQuantity
 							, price
 							, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex())
-							, squareoffValue, squareoffAbsValue
+							, target, absoluteTarget
 							, tick.getLowPrice()
 							, tick.getOpenPrice()
 							, tick.getHighPrice()
-							, stoplossValue, stoplossAbsValue
-							, trailingStoploss);
+							, stoploss, absoluteStopLoss
+							, trailingStopLoss);
 				} else {
 					ORDER_LOGGER.error(ORDER_GENERATION_FAILED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol()
 							, properties.getParameterData().getTransactionType().get(transactionType.getIndex())
 							, tradeQuantity
 							, price
 							, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()).toUpperCase()
-							, squareoffValue, squareoffAbsValue
-							, stoplossValue, stoplossAbsValue
-							, trailingStoploss);
+							, target, absoluteTarget
+							, stoploss, absoluteStopLoss
+							, trailingStopLoss);
 				}
 				if (tradedCount >= tradeCount) {
 					break;
@@ -489,9 +508,9 @@ public class KiteTradeSystemFacade implements TradeSystemFacade, SessionExpiryHo
 						, tradeQuantity
 						, price
 						, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()).toUpperCase()
-						, squareoffValue, squareoffAbsValue
-						, stoplossValue, stoplossAbsValue
-						, trailingStoploss);
+						, target, absoluteTarget
+						, stoploss, absoluteStopLoss
+						, trailingStopLoss);
 			}
 		}
 		if (unsubscribeTicks.size() > 0) {
