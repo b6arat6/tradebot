@@ -12,7 +12,7 @@ import com.juststocks.tradebot.exception.AuthException;
  */
 public interface Tradebot extends TradebotConstants {
 	
-	boolean run(String[] args);
+	boolean start(String[] args);
 	
 	boolean init(String[] args);
 

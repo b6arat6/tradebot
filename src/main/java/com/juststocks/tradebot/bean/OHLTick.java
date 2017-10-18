@@ -17,7 +17,11 @@ public abstract class OHLTick extends Tick implements Comparable<OHLTick> {
 		this.tick = tick;
 	}
 	
-	public boolean isOLOH() {
+	public boolean isOLOrOH() {
+		return tick.getOpenPrice() == tick.getLowPrice() || tick.getOpenPrice() == tick.getHighPrice();
+	}
+	
+	public boolean isOLAndOH() {
 		return tick.getOpenPrice() == tick.getLowPrice() && tick.getOpenPrice() == tick.getHighPrice();
 	}
 	

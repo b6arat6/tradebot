@@ -13,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import com.juststocks.tradebot.actor.TradeGeneratorActor;
 import com.juststocks.tradebot.constants.TradebotConstants;
 
 import akka.actor.ActorSystem;
@@ -32,6 +33,9 @@ public class TradebotApplication implements TradebotConstants, ExitCodeGenerator
 	private static ConfigurableApplicationContext context;
 	
 	private static TradebotApplication tradebotApplication;
+	
+	@Autowired
+	private TradeGeneratorActor.TradeTriggerData tradeTriggerData;
 	
 	@Autowired
 	private ZerodhaTradebot zerodhaTradebot;
@@ -71,30 +75,49 @@ public class TradebotApplication implements TradebotConstants, ExitCodeGenerator
 		Thread zerodhaTradebotThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if (!tradebotApplication.zerodhaTradebot.run(args)) {
+				if (!tradebotApplication.zerodhaTradebot.start(args)) {
 					SpringApplication.exit(context, tradebotApplication);
+					tradebotApplication.zerodhaTradebot.shutdown();
 					System.exit(-1);
 				}
 			}
 		});
 		zerodhaTradebotThread.start();
 		
-		System.err.println(ENTER_COMMAND);
+		String command = null;
+//		System.err.println(ENTER_COMMAND);
 		while (!shutdown) {
-			switch (Integer.valueOf(BUFFERED_READER.readLine())) {
-			case COMMAND_SHUTDOWN:
-				shutdown = true;
-				zerodhaTradebotThread.interrupt();
-				System.exit(-1);
-				break;
-			case COMMAND_TRADE_OHL:
-				tradebotApplication.zerodhaTradebot.tradeSystemFacade.triggerTrades(ACTOR_TRADE_GENERATOR_MSG_TYPE_TRADE_OHL);
-				break;
-			default:
-				break;
+			try {
+				command = BUFFERED_READER.readLine();
+				switch (Integer.valueOf(command)) {
+				case COMMAND_SHUTDOWN:
+					shutdown = true;
+					zerodhaTradebotThread.interrupt();
+					System.exit(-1);
+					break;
+				case COMMAND_TRADE_OHL:
+					while (command == null || !command.contains(SYMBOL_HYPHEN)) {
+						try {
+							command = BUFFERED_READER.readLine();
+							if (command.contains(SYMBOL_HYPHEN)) {
+								tradebotApplication.tradeTriggerData.setTradeStrategy(command.split(SYMBOL_HYPHEN)[0]);
+								tradebotApplication.tradeTriggerData.setTradeStrategyType(command.split(SYMBOL_HYPHEN)[1]);
+								tradebotApplication.tradeTriggerData.setTradeCount(Integer.valueOf(command.split(SYMBOL_HYPHEN)[2]));
+								tradebotApplication.tradeTriggerData.setTradeQty(Integer.valueOf(command.split(SYMBOL_HYPHEN)[3]));
+								tradebotApplication.zerodhaTradebot.tradeSystemFacade.triggerTrades(tradebotApplication.tradeTriggerData);
+							}
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+					}
+					break;
+				default:
+					break;
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
 		}
-		
 		LOGGER.info(METHOD_EXIT);
 	}
 

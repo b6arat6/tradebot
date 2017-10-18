@@ -1,17 +1,17 @@
 /**
  * 
  */
-package com.juststocks.tradebot.akka;
+package com.juststocks.tradebot.actor;
 
-import static com.juststocks.tradebot.bean.KiteProperties.nonOHLTickSet;
-import static com.juststocks.tradebot.bean.KiteProperties.orderedTickMap;
+import static com.juststocks.tradebot.bean.ZerodhaProperties.nonOHLTickSet;
+import static com.juststocks.tradebot.bean.ZerodhaProperties.orderedTickMap;
 
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.juststocks.tradebot.bean.KiteProperties;
+import com.juststocks.tradebot.bean.ZerodhaProperties;
 import com.juststocks.tradebot.constants.TradebotConstants;
 import com.rainmatter.models.Tick;
 
@@ -28,17 +28,17 @@ public class TickDispenserActor extends AbstractActor implements TradebotConstan
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
 	
-	public static Props props(KiteProperties kiteProperties, ActorRef ohlTradeStrategyActorRef) {
-		return Props.create(TickDispenserActor.class, () -> new TickDispenserActor(kiteProperties, ohlTradeStrategyActorRef));
+	public static Props props(ZerodhaProperties zerodhaProperties, ActorRef ohlTradeStrategyActorRef) {
+		return Props.create(TickDispenserActor.class, () -> new TickDispenserActor(zerodhaProperties, ohlTradeStrategyActorRef));
 	}
 
 	@SuppressWarnings("unused")
-	private KiteProperties kiteProperties;
+	private ZerodhaProperties zerodhaProperties;
 	
 	private ActorRef ohlTradeStrategyActorRef;
 	
-	public TickDispenserActor(KiteProperties kiteProperties, ActorRef ohlTradeStrategyActorRef) {
-		this.kiteProperties = kiteProperties;
+	public TickDispenserActor(ZerodhaProperties zerodhaProperties, ActorRef ohlTradeStrategyActorRef) {
+		this.zerodhaProperties = zerodhaProperties;
 		this.ohlTradeStrategyActorRef = ohlTradeStrategyActorRef;
 	}
 

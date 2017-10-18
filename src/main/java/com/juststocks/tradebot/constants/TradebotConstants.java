@@ -41,6 +41,7 @@ public interface TradebotConstants {
 	public static final String ORDER_GENERATED = "Order generated for "
 													+ SYMBOL_NEW_LINE + "I={}"
 													+ SYMBOL_NEW_LINE + "TransactionType={}_{}({})"
+													+ SYMBOL_NEW_LINE + "NLHC={}"
 													+ SYMBOL_NEW_LINE + "Quantity={}"
 													+ SYMBOL_NEW_LINE + "Price={}"
 													+ SYMBOL_NEW_LINE + "OrderVariety={}"

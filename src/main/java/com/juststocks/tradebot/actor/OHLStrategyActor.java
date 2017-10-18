@@ -1,9 +1,9 @@
 /**
  * 
  */
-package com.juststocks.tradebot.akka;
+package com.juststocks.tradebot.actor;
 
-import static com.juststocks.tradebot.bean.KiteProperties.*;
+import static com.juststocks.tradebot.bean.ZerodhaProperties.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +11,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.juststocks.tradebot.bean.KiteProperties;
+import com.juststocks.tradebot.bean.ZerodhaProperties;
 import com.juststocks.tradebot.bean.OHLTick;
 import com.juststocks.tradebot.bean.OHTick;
 import com.juststocks.tradebot.bean.OLTick;
 import com.juststocks.tradebot.constants.TradebotConstants;
-import com.juststocks.tradebot.facade.KiteTradeSystemFacade;
+import com.juststocks.tradebot.facade.KiteTradeFacade;
 import com.rainmatter.models.Tick;
 
 import akka.actor.AbstractActor;
@@ -30,24 +30,24 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_STRATEGY);
 
-	public static Props props(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
-		return Props.create(OHLStrategyActor.class, () -> new OHLStrategyActor(kiteProperties, kiteTradeSystemFacade));
+	public static Props props(ZerodhaProperties zerodhaProperties, KiteTradeFacade kiteTradeFacade) {
+		return Props.create(OHLStrategyActor.class, () -> new OHLStrategyActor(zerodhaProperties, kiteTradeFacade));
 	}
 
-	private KiteProperties kiteProperties;
+	private ZerodhaProperties zerodhaProperties;
 
-	private KiteTradeSystemFacade kiteTradeSystemFacade;
+	private KiteTradeFacade kiteTradeFacade;
 
-	public OHLStrategyActor(KiteProperties kiteProperties, KiteTradeSystemFacade kiteTradeSystemFacade) {
-		this.kiteProperties = kiteProperties;
-		this.kiteTradeSystemFacade = kiteTradeSystemFacade;
+	public OHLStrategyActor(ZerodhaProperties zerodhaProperties, KiteTradeFacade kiteTradeFacade) {
+		this.zerodhaProperties = zerodhaProperties;
+		this.kiteTradeFacade = kiteTradeFacade;
 	}
 	
 	@Override
 	public Receive createReceive() {
 		return receiveBuilder().match(Tick.class, tick -> {
 			OHLTick ohlTick = new OHTick(tick);
-			if (!ohlTick.isOLOH()
+			if (!ohlTick.isOLAndOH()
 					&& !nonOHLTickSet.contains(tick.getToken())
 					&& !orderedTickMap.containsKey(tick.getToken())) {
 				List<Long> unsubscribeTicks = new ArrayList<>();
@@ -56,18 +56,18 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 				if (olTick.isOL()) {
 					if (olTickMap.containsKey(tick.getToken())) {
 						if (olTickMap.put(tick.getToken(), olTick) != null) {	
-							LOGGER.info(STRATEGY_OHL_OL_UPDATED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
+							LOGGER.info(STRATEGY_OHL_OL_UPDATED, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 									tick.getLastTradedPrice(), 
 									tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 									tick.getToken());
 						} else {
-							LOGGER.warn(STRATEGY_OHL_OL_UPDATE_FAILED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
+							LOGGER.warn(STRATEGY_OHL_OL_UPDATE_FAILED, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 									tick.getLastTradedPrice(), 
 									tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 									tick.getToken());
 						}
 					} else {
-						LOGGER.info(STRATEGY_OHL_OL, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
+						LOGGER.info(STRATEGY_OHL_OL, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
@@ -76,18 +76,18 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 				} else if (ohTick.isOH()) {
 					if (ohTickMap.containsKey(tick.getToken())) {
 					    if (ohTickMap.put(tick.getToken(), ohTick) != null) {
-					    	LOGGER.info(STRATEGY_OHL_OH_UPDATED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
+					    	LOGGER.info(STRATEGY_OHL_OH_UPDATED, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 					    			tick.getLastTradedPrice(),   
 									tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 									tick.getToken());
 						} else {
-							LOGGER.warn(STRATEGY_OHL_OH_UPDATE_FAILED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
+							LOGGER.warn(STRATEGY_OHL_OH_UPDATE_FAILED, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 					    			tick.getLastTradedPrice(),   
 									tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 									tick.getToken());
 						}
 					} else {
-						LOGGER.info(STRATEGY_OHL_OH, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
+						LOGGER.info(STRATEGY_OHL_OH, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
@@ -95,22 +95,22 @@ public final class OHLStrategyActor extends AbstractActor implements TradebotCon
 					}
 				} else {
 					if (olTickMap.containsKey(tick.getToken()) && olTickMap.remove(tick.getToken()) != null) {
-						LOGGER.warn(STRATEGY_OHL_OL_REMOVED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
+						LOGGER.warn(STRATEGY_OHL_OL_REMOVED, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
 					} else if (ohTickMap.containsKey(tick.getToken()) && ohTickMap.remove(tick.getToken()) != null) {
-						LOGGER.warn(STRATEGY_OHL_OH_REMOVED, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
+						LOGGER.warn(STRATEGY_OHL_OH_REMOVED, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
 								tick.getLastTradedPrice(), 
 								tick.getLowPrice(), tick.getOpenPrice(), tick.getHighPrice(),
 								tick.getToken());
 					}
-					LOGGER.info(INSTRUMENT_UNSUBSCRIBING, kiteProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken());
+					LOGGER.info(INSTRUMENT_UNSUBSCRIBING, zerodhaProperties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken());
 					unsubscribeTicks.add(tick.getToken());
 					nonOHLTickSet.add(tick.getToken());
 				}
 				if (unsubscribeTicks.size() > 0) {
-					kiteTradeSystemFacade.unsubscribeInstruments((ArrayList<Long>) unsubscribeTicks);
+					kiteTradeFacade.unsubscribeInstruments((ArrayList<Long>) unsubscribeTicks);
 				}
 				LOGGER.info(OL_TICK_MAP_SIZE, olTickMap.size());
 				LOGGER.info(OH_TICK_MAP_SIZE, ohTickMap.size());

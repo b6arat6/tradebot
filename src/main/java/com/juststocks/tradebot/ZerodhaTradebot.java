@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.juststocks.tradebot.bean.KiteProperties;
+import com.juststocks.tradebot.bean.ZerodhaProperties;
 import com.juststocks.tradebot.exception.AuthException;
-import com.juststocks.tradebot.facade.KiteTradeSystemFacade;
+import com.juststocks.tradebot.facade.KiteTradeFacade;
 
 /**
  * @author bharath_kandasamy
@@ -24,13 +24,13 @@ public class ZerodhaTradebot implements Tradebot {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LOGGER_MAIN);
 	
 	@Autowired
-	public KiteProperties properties;
+	public ZerodhaProperties properties;
 	
 	@Autowired
-	public KiteTradeSystemFacade tradeSystemFacade;
+	public KiteTradeFacade tradeSystemFacade;
 	
 	@Override
-	public boolean run(String[] args) {
+	public boolean start(String[] args) {
 		LOGGER.info(METHOD_ENTRY);
 		if (init(args)) {
 			if (!execute()) {
@@ -90,6 +90,7 @@ public class ZerodhaTradebot implements Tradebot {
 
 	@Override
 	public boolean shutdown() {
+		// TODO
 		return true;
 	}
 

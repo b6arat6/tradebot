@@ -23,8 +23,8 @@ import com.rainmatter.models.Instrument;
  * @author bharath_kandasamy
  *
  */
-@ConfigurationProperties("com.juststocks.tradebot.kite")
-public class KiteProperties implements TradebotConstants {
+@ConfigurationProperties("com.juststocks.tradebot.zerodha")
+public class ZerodhaProperties implements TradebotConstants {
 	
 	public static Map<Long, OLTick> olTickMap = new ConcurrentHashMap<>();
 	public static Map<Long, OHTick> ohTickMap = new ConcurrentHashMap<>();
@@ -69,7 +69,7 @@ public class KiteProperties implements TradebotConstants {
 	
 	private Map<Long, Instrument> tradingInstrumentMap = new HashMap<>();
 	
-	private int tickDisperserActorRoutees;
+	private int tickDispenserActorRoutees;
 	
 	private int ohlStrategyActorRoutees;
 	
@@ -112,6 +112,8 @@ public class KiteProperties implements TradebotConstants {
 	private double ohlTradeBOTargetPercent;
 	
 	private double ohlTradeBOTrailingStoploss;
+	
+	private boolean testingEnabled;
 	
 	public String getUserId() {
 		return userId;
@@ -283,12 +285,12 @@ public class KiteProperties implements TradebotConstants {
 		}
 	}
 
-	public int getTickDisperserActorRoutees() {
-		return tickDisperserActorRoutees;
+	public int getTickDispenserActorRoutees() {
+		return tickDispenserActorRoutees;
 	}
 
-	public void setTickDisperserActorRoutees(int tickDisperserActorRoutees) {
-		this.tickDisperserActorRoutees = tickDisperserActorRoutees;
+	public void setTickDispenserActorRoutees(int tickDispenserActorRoutees) {
+		this.tickDispenserActorRoutees = tickDispenserActorRoutees;
 	}
 
 	public int getOhlStrategyActorRoutees() {
@@ -458,6 +460,14 @@ public class KiteProperties implements TradebotConstants {
 
 	public void setOhlTradeBOTrailingStoploss(double ohlTradeBOTrailingStoploss) {
 		this.ohlTradeBOTrailingStoploss = ohlTradeBOTrailingStoploss;
+	}
+
+	public boolean isTestingEnabled() {
+		return testingEnabled;
+	}
+
+	public void setTestingEnabled(boolean offlineTesting) {
+		this.testingEnabled = offlineTesting;
 	}
 
 }

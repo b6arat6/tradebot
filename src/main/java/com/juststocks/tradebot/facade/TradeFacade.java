@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import com.juststocks.tradebot.actor.TradeGeneratorActor.TradeTriggerData;
 import com.juststocks.tradebot.bean.response.kiteconnect.ParameterData;
 import com.juststocks.tradebot.constants.TradebotConstants;
 import com.juststocks.tradebot.exception.AuthException;
@@ -15,7 +16,7 @@ import com.juststocks.tradebot.exception.AuthException;
  * @author bharath_kandasamy
  *
  */
-public interface TradeSystemFacade extends TradebotConstants {
+public interface TradeFacade extends TradebotConstants {
 
 	boolean login();
 	
@@ -33,7 +34,7 @@ public interface TradeSystemFacade extends TradebotConstants {
 	
 	boolean initWebSocket();
 	
-	public void triggerTrades(final String tradeType);
+	public void triggerTrades(final TradeTriggerData tradeTriggerData);
 	
 	public void scheduledOHLTradesTrigger();
 	
@@ -55,6 +56,10 @@ public interface TradeSystemFacade extends TradebotConstants {
 			double stoplossValue,
 			double trailingStoploss);
 	
-	<E> boolean placeOHLOrder(Collection<E> ohlTickCollection, final int tradeCount, final ParameterData.ValueIndexEnum transactionType, int ohlSign);
+	<E> boolean placeOHLOrder(Collection<E> ohlTickCollection
+			, final int tradeCount
+			, int tradeQty
+			, final ParameterData.ValueIndexEnum transactionType
+			, int ohlSign);
 	
 }
