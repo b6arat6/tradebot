@@ -63,7 +63,7 @@ public class ZerodhaTradebot implements Tradebot {
 					LOGGER.info(AUTHENTICATION_SUCCESS);
 					if (tradeSystemFacade.loadParameters()) {
 						LOGGER.info(PARAMETER_LOAD_SUCCESS);
-						if (tradeSystemFacade.getInstruments(
+						if (tradeSystemFacade.loadExchangeInstruments(
 								properties.getParameterData().getExchange().get(properties.getOhlStrategyExchangeValueIndex()))) {
 							LOGGER.info(EXCHANGE_INSTRUMENTS_GET_SUCCESS);
 							if (tradeSystemFacade.initWebSocket()) {

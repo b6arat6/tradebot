@@ -149,12 +149,12 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 	}
 
 	@Override
-	public boolean getInstruments(String exchange) {
+	public boolean loadExchangeInstruments(String exchange) {
 		MAIN_LOGGER.info(METHOD_ENTRY);
 		List<Instrument> instruments = null;
 		try {
 			instruments = kiteConnect.getInstruments(exchange);
-			properties.setInstrumentsMap(exchange, instruments);
+			properties.setExchangeInstrumentMap(exchange, instruments);
 			MAIN_LOGGER.debug(RESPONSE_EXCHANGE_INSTRUMENTS, exchange, instruments);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -167,7 +167,29 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 			e.printStackTrace();
 		}
 		MAIN_LOGGER.info(METHOD_EXIT);
-		return instruments.size() > 0;
+		return instruments != null && instruments.size() > 0;
+	}
+	
+	@Override
+	public boolean loadLocalInstruments(String exchange) {
+		MAIN_LOGGER.info(METHOD_ENTRY);
+		List<Instrument> instruments = null;
+		try {
+			instruments = kiteConnect.getInstruments(exchange);
+			properties.setLocalInstrumentMap(exchange, instruments);
+			MAIN_LOGGER.debug(RESPONSE_EXCHANGE_INSTRUMENTS, exchange, instruments);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KiteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		MAIN_LOGGER.info(METHOD_EXIT);
+		return instruments != null && instruments.size() > 0;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -363,19 +385,29 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 		List<Long> unsubscribeTicks = new ArrayList<>();
 		for (OHLTick ohlTick : (Collection<OHLTick>) ohlTickCollection) {
 			tick = ohlTick.tick;
-			quote = this.<Quote> getQuote(tick.getToken());
-			try {
-				Thread.sleep(450);
-			} catch (InterruptedException e) {
-				ORDER_LOGGER.debug(e.getMessage());
+			if (!properties.isOfflineTestingEnabled()) {
+				quote = this.<Quote> getQuote(tick.getToken());
+				try {
+					Thread.sleep(450);
+				} catch (InterruptedException e) {
+					ORDER_LOGGER.debug(e.getMessage());
+				}
+				tick.setOpenPrice(quote.ohlc.open);
+				tick.setLowPrice(quote.ohlc.low);
+				tick.setHighPrice(quote.ohlc.high);
+				tick.setTotalBuyQuantity(quote.buyQuantity);
+				tick.setTotalSellQuantity(quote.sellQuantity);
+				tick.setLastTradedPrice(quote.lastPrice);
+				tick.setMarketDepth(quote.depth);	
+			} else {
+				price = tick.getLastTradedPrice();
+				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()) {
+					orderSign = SYMBOL_PLUS;
+				}
+				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()) {
+					orderSign = SYMBOL_MINUS;
+				}
 			}
-			tick.setOpenPrice(quote.ohlc.open);
-			tick.setLowPrice(quote.ohlc.low);
-			tick.setHighPrice(quote.ohlc.high);
-			tick.setTotalBuyQuantity(quote.buyQuantity);
-			tick.setTotalSellQuantity(quote.sellQuantity);
-			tick.setLastTradedPrice(quote.lastPrice);
-			tick.setMarketDepth(quote.depth);
 			if (!ohlTick.isOLOrOH()) {
 				if (olTickMap.remove(tick.getToken()) != null) {
 					ORDER_LOGGER.warn(STRATEGY_OHL_OL_REMOVED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol(), tick.getToken(),
@@ -422,36 +454,38 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 				}
 				continue;
 			}
-			if (properties.getOhlTradeOrderTypeValueIndex() == ParameterData.ValueIndexEnum.ORDER_TYPE_LIMIT.getIndex()) {
-				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()) {
-					price = tick.getMarketDepth()
-							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()).toLowerCase())
-							.get(0)
-							.getPrice();
-					price = Precision.round(price + 0.05, 2);
-					if (properties.isTestingEnabled()) {
-						price = tick.getLastTradedPrice();
-					} else {
-						if (price <= tick.getOpenPrice()) {
-							continue;
+			if (!properties.isOfflineTestingEnabled()) {
+				if (properties.getOhlTradeOrderTypeValueIndex() == ParameterData.ValueIndexEnum.ORDER_TYPE_LIMIT.getIndex()) {
+					if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()) {
+						price = tick.getMarketDepth()
+								.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_BUY.getIndex()).toLowerCase())
+								.get(0)
+								.getPrice();
+						price = Precision.round(price + 0.05, 2);
+						if (properties.isOnlineTestingEnabled()) {
+							price = tick.getLastTradedPrice();
+						} else {
+							if (price <= tick.getOpenPrice()) {
+								continue;
+							}
 						}
+						orderSign = SYMBOL_PLUS;
 					}
-					orderSign = SYMBOL_PLUS;
-				}
-				if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()) {
-					price = tick.getMarketDepth()
-							.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()).toLowerCase())
-							.get(0)
-							.getPrice();
-					price = Precision.round(price - 0.05, 2);
-					if (properties.isTestingEnabled()) {
-						price = tick.getLastTradedPrice();
-					} else {
-						if (price >= tick.getOpenPrice()) {
-							continue;
+					if (transactionType.getIndex() == ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()) {
+						price = tick.getMarketDepth()
+								.get(properties.getParameterData().getTransactionType().get(ParameterData.ValueIndexEnum.TRANSACTION_TYPE_SELL.getIndex()).toLowerCase())
+								.get(0)
+								.getPrice();
+						price = Precision.round(price - 0.05, 2);
+						if (properties.isOnlineTestingEnabled()) {
+							price = tick.getLastTradedPrice();
+						} else {
+							if (price >= tick.getOpenPrice()) {
+								continue;
+							}
 						}
+						orderSign = SYMBOL_MINUS;
 					}
-					orderSign = SYMBOL_MINUS;
 				}
 			}
 			if (properties.getOhlStrategyInstrumentType().equals(TradeTriggerEnum.INSTRUMENT_TYPE_EQ.getValue())) {
@@ -476,7 +510,7 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 				trailingStopLoss = properties.getOhlTradeBOTrailingStoploss();
 			}
 			try {
-				if (!properties.isTestingEnabled()) {
+				if (!properties.isOnlineTestingEnabled()) {
 					order = kiteConnect.placeOrder(
 							buildOrderParamMap(
 									properties.getParameterData().getExchange().get(properties.getOhlStrategyExchangeValueIndex())
@@ -493,6 +527,15 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 									, stoploss
 									, trailingStopLoss)
 					, properties.getParameterData().getOrderVariety().get(properties.getOhlTradeOrderVarietyValueIndex()));
+					orderedTickMap.put(tick.getToken(), order.orderId);
+					olTickMap.remove(tick.getToken());
+					ohTickMap.remove(tick.getToken());
+					unsubscribeTicks.add(tick.getToken());
+					try {
+						Thread.sleep(450);
+					} catch (InterruptedException e) {
+						ORDER_LOGGER.debug(e.getMessage());
+					}
 				}
 			} catch (KiteException e) {
 				ORDER_LOGGER.error(EXCEPTION_ORDER_KITE.replace(REPLACE_HOLDER_CODE, String.valueOf(e.code))
@@ -507,17 +550,8 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 						, stoploss, absoluteStopLoss
 						, trailingStopLoss);
 			}
-			if (order != null || properties.isTestingEnabled()) {
-				try {
-					Thread.sleep(450);
-				} catch (InterruptedException e) {
-					ORDER_LOGGER.debug(e.getMessage());
-				}
+			if (order != null || properties.isOnlineTestingEnabled()) {
 				tradedCount++;
-				orderedTickMap.put(tick.getToken(), order.orderId);
-				olTickMap.remove(tick.getToken());
-				ohTickMap.remove(tick.getToken());
-				unsubscribeTicks.add(tick.getToken());
 				ORDER_LOGGER.info(ORDER_GENERATED, properties.getTradingInstrumentMap().get(tick.getToken()).getTradingsymbol().toUpperCase()
 						, properties.getParameterData().getTransactionType().get(transactionType.getIndex()) , tradedCount, orderSign
 						, String.valueOf(ohlTick.getTotalNetLowHighChange())
@@ -549,5 +583,6 @@ public class KiteTradeFacade implements TradeFacade, SessionExpiryHook, OnConnec
 		}
 		return true;
 	}
+
 
 }

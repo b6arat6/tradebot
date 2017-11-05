@@ -63,11 +63,15 @@ public class ZerodhaProperties implements TradebotConstants {
 	
 	private ParameterData parameterData;
 	
+	private Map<String, List<Instrument>> exchangeInstrumentMap = new HashMap<>();
+
+	private Map<String, List<Instrument>> localInstrumentMap = new HashMap<>();
+	
+	private Map<Long, Instrument> tradingInstrumentMap = new HashMap<>();
+	
 	private Map<String, List<Instrument>> instrumentMap = new HashMap<>();
 	
 	private List<Long> tradingTokens = new ArrayList<>();
-	
-	private Map<Long, Instrument> tradingInstrumentMap = new HashMap<>();
 	
 	private int tickDispenserActorRoutees;
 	
@@ -113,7 +117,9 @@ public class ZerodhaProperties implements TradebotConstants {
 	
 	private double ohlTradeBOTrailingStoploss;
 	
-	private boolean testingEnabled;
+	private boolean onlineTestingEnabled;
+	
+	private boolean offlineTestingEnabled;
 	
 	public String getUserId() {
 		return userId;
@@ -245,42 +251,50 @@ public class ZerodhaProperties implements TradebotConstants {
 		this.parameterData = parameterData;
 	}
 
-	public Map<String, List<Instrument>> getInstrumentMap() {
-		return instrumentMap;
+	public Map<String, List<Instrument>> getExchangeInstrumentMap() {
+		return exchangeInstrumentMap;
 	}
 
-	public void setInstrumentsMap(String exchange, List<Instrument> instruments) {
-		instrumentMap.put(exchange, instruments);
-		setTradingTokens();
-		setInstrumentMap();
+	public void setExchangeInstrumentMap(String exchange, List<Instrument> instruments) {
+		exchangeInstrumentMap.put(exchange, instruments);
+//		setTradingTokens();
+//		setTradingInstrumentMap();
+	}
+	
+	public Map<String, List<Instrument>> getLocalInstrumentMap() {
+		return localInstrumentMap;
+	}
+	
+	public void setLocalInstrumentMap(String exchange, List<Instrument> instruments) {
+		localInstrumentMap.put(exchange, instruments);
 	}
 
 	public List<Long> getTradingTokens() {
 		return tradingTokens;
 	}
-
-	public void setTradingTokens() {
-		for (Instrument instrument : getInstrumentMap().get(getParameterData().getExchange().get(ohlStrategyExchangeValueIndex))) {
-			if (instrument.getInstrument_type().equals(ohlStrategyInstrumentType)
-					&& (org.apache.commons.lang3.StringUtils.isBlank(ohlStrategyExpiryMonth) 
-					|| instrument.getTradingsymbol().contains(ohlStrategyExpiryMonth.toUpperCase()))
-					&& !instrument.getTradingsymbol().contains(SYMBOL_HYPHEN)) {
-				this.tradingTokens.add(instrument.getInstrument_token());
-			}
-		}
-	}
-
+	
 	public Map<Long, Instrument> getTradingInstrumentMap() {
 		return tradingInstrumentMap;
 	}
 
-	public void setInstrumentMap() {
-		for (Instrument instrument : getInstrumentMap().get(getParameterData().getExchange().get(ohlStrategyExchangeValueIndex))) {
+	public void setTradingInstrumentMap(Map<String, List<Instrument>> instrumentMap) {
+		for (Instrument instrument : instrumentMap.get(getParameterData().getExchange().get(ohlStrategyExchangeValueIndex))) {
 			if (instrument.getInstrument_type().equals(ohlStrategyInstrumentType)
 					&& (org.apache.commons.lang3.StringUtils.isBlank(ohlStrategyExpiryMonth) 
 					|| instrument.getTradingsymbol().contains(ohlStrategyExpiryMonth.toUpperCase()))
 					&& !instrument.getTradingsymbol().contains(SYMBOL_HYPHEN)) {
 				this.tradingInstrumentMap.put(instrument.getInstrument_token(), instrument);
+			}
+		}
+	}
+
+	public void setTradingTokens() {
+		for (Instrument instrument : getExchangeInstrumentMap().get(getParameterData().getExchange().get(ohlStrategyExchangeValueIndex))) {
+			if (instrument.getInstrument_type().equals(ohlStrategyInstrumentType)
+					&& (org.apache.commons.lang3.StringUtils.isBlank(ohlStrategyExpiryMonth) 
+					|| instrument.getTradingsymbol().contains(ohlStrategyExpiryMonth.toUpperCase()))
+					&& !instrument.getTradingsymbol().contains(SYMBOL_HYPHEN)) {
+				this.tradingTokens.add(instrument.getInstrument_token());
 			}
 		}
 	}
@@ -462,12 +476,20 @@ public class ZerodhaProperties implements TradebotConstants {
 		this.ohlTradeBOTrailingStoploss = ohlTradeBOTrailingStoploss;
 	}
 
-	public boolean isTestingEnabled() {
-		return testingEnabled;
+	public boolean isOnlineTestingEnabled() {
+		return onlineTestingEnabled;
 	}
 
-	public void setTestingEnabled(boolean offlineTesting) {
-		this.testingEnabled = offlineTesting;
+	public void setOnlineTestingEnabled(boolean offlineTesting) {
+		this.onlineTestingEnabled = offlineTesting;
+	}
+
+	public boolean isOfflineTestingEnabled() {
+		return offlineTestingEnabled;
+	}
+
+	public void setOfflineTestingEnabled(boolean offlineTestingEnabled) {
+		this.offlineTestingEnabled = offlineTestingEnabled;
 	}
 
 }

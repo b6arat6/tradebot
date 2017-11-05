@@ -26,7 +26,9 @@ public interface TradeFacade extends TradebotConstants {
 	
 	boolean getInstruments();
 
-	boolean getInstruments(String exchange);
+	boolean loadExchangeInstruments(String exchange);
+	
+	boolean loadLocalInstruments(String exchange);
 	
 	<T> T getQuoteIndices(Long token);
 	
